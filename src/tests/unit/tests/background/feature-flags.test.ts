@@ -17,7 +17,6 @@ describe('FeatureFlagsTest', () => {
 
     test('default values', () => {
         const expectedValues: FeatureFlagStoreData = {
-            [FeatureFlags.shadowDialog]: false,
             [FeatureFlags.showAllAssessments]: false,
             [FeatureFlags.logTelemetryToConsole]: false,
             [FeatureFlags.showAllFeatureFlags]: false,
@@ -26,7 +25,6 @@ describe('FeatureFlagsTest', () => {
             [FeatureFlags.manualInstanceDetails]: false,
             [FeatureFlags.debugTools]: false,
             [FeatureFlags.exportReportOptions]: false,
-            [FeatureFlags.needsReview]: true,
             [FeatureFlags.saveAndLoadAssessment]: false,
         };
 

@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import * as React from 'react';
 
 import { pageTitleInstanceDetailsColumnRenderer } from 'assessments/page/pagetitle-instance-details-column-renderer';
+import { InstanceTableRow } from 'assessments/types/instance-table-data';
+import * as React from 'react';
 import { HeadingsAssessmentProperties } from '../../../../common/types/store-data/assessment-result-data';
 import { AssessmentInstanceDetailsColumn } from '../../../../DetailsView/components/assessment-instance-details-column';
-import { AssessmentInstanceRowData } from '../../../../DetailsView/components/assessment-instance-table';
 
 describe('PageTitleInstanceDetailsColumnRendererTest', () => {
     test('render: propertyBag is null', () => {
@@ -13,14 +13,8 @@ describe('PageTitleInstanceDetailsColumnRendererTest', () => {
             instance: {
                 propertyBag: null,
             },
-        } as AssessmentInstanceRowData<HeadingsAssessmentProperties>;
-        const expected = (
-            <AssessmentInstanceDetailsColumn
-                background={null}
-                textContent={null}
-                tooltipId={null}
-            />
-        );
+        } as InstanceTableRow<HeadingsAssessmentProperties>;
+        const expected = <AssessmentInstanceDetailsColumn textContent={null} />;
         expect(expected).toEqual(pageTitleInstanceDetailsColumnRenderer(item));
     });
 
@@ -32,14 +26,8 @@ describe('PageTitleInstanceDetailsColumnRendererTest', () => {
                     pageTitle: pageTitle,
                 },
             },
-        } as AssessmentInstanceRowData<any>;
-        const expected = (
-            <AssessmentInstanceDetailsColumn
-                background={null}
-                textContent={pageTitle}
-                tooltipId={null}
-            />
-        );
+        } as InstanceTableRow<any>;
+        const expected = <AssessmentInstanceDetailsColumn textContent={pageTitle} />;
         expect(expected).toEqual(pageTitleInstanceDetailsColumnRenderer(item));
     });
 });

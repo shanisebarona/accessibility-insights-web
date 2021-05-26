@@ -3,6 +3,9 @@
 import { getRTL } from '@uifabric/utilities';
 
 import { NavigatorUtils } from 'common/navigator-utils';
+import { FrameMessenger } from 'injected/frameCommunicators/frame-messenger';
+import { getCellAndHeaderElementsFromResult } from 'injected/visualization/get-cell-and-header-elements';
+import { TableHeadersAttributeFormatter } from 'injected/visualization/table-headers-formatter';
 import { BrowserAdapter } from '../../common/browser-adapters/browser-adapter';
 import { HTMLElementUtils } from '../../common/html-element-utils';
 import { TabbableElementsHelper } from '../../common/tabbable-elements-helper';
@@ -10,7 +13,6 @@ import { DeepPartial } from '../../common/types/deep-partial';
 import { WindowUtils } from '../../common/window-utils';
 import { ClientUtils } from '../client-utils';
 import { DetailsDialogHandler } from '../details-dialog-handler';
-import { FrameCommunicator } from '../frameCommunicators/frame-communicator';
 import { ShadowUtils } from '../shadow-utils';
 import { CenterPositionCalculator } from './center-position-calculator';
 import { CustomWidgetsFormatter } from './custom-widgets-formatter';
@@ -43,7 +45,7 @@ export class DrawerProvider {
         private readonly drawerUtils: DrawerUtils,
         private readonly clientUtils: ClientUtils,
         private readonly dom: Document,
-        private readonly frameCommunicator: FrameCommunicator,
+        private readonly frameMessenger: FrameMessenger,
         private readonly browserAdapter: BrowserAdapter,
         private readonly getRTLFunc: typeof getRTL,
         private readonly detailsDialogHandler: DetailsDialogHandler,
@@ -96,7 +98,7 @@ export class DrawerProvider {
 
     public createIssuesDrawer(): Drawer {
         const formatter = new IssuesFormatter(
-            this.frameCommunicator,
+            this.frameMessenger,
             this.htmlElementUtils,
             this.windowUtils,
             this.navigatorUtils,
@@ -121,6 +123,21 @@ export class DrawerProvider {
     public createNonTextComponentDrawer(): Drawer {
         const formatter = new NonTextComponentFormatter();
         return this.createDrawer('non-text-component', formatter);
+    }
+
+    public createTableHeaderAttributeDrawer(): Drawer {
+        const formatter = new TableHeadersAttributeFormatter();
+
+        return new HighlightBoxDrawer(
+            this.dom,
+            'insights-header-attribute-highlight-box',
+            this.windowUtils,
+            this.shadowUtils,
+            this.drawerUtils,
+            this.clientUtils,
+            formatter,
+            getCellAndHeaderElementsFromResult,
+        );
     }
 
     private createDrawer(containerClass: string, formatter: Formatter): Drawer {

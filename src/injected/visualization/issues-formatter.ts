@@ -1,15 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 import { getRTL } from '@uifabric/utilities';
+import { NavigatorUtils } from 'common/navigator-utils';
+import { FrameMessenger } from 'injected/frameCommunicators/frame-messenger';
 import * as ReactDOM from 'react-dom';
 
-import { NavigatorUtils } from 'common/navigator-utils';
 import { BrowserAdapter } from '../../common/browser-adapters/browser-adapter';
 import { HTMLElementUtils } from '../../common/html-element-utils';
 import { WindowUtils } from '../../common/window-utils';
 import { DetailsDialogHandler } from '../details-dialog-handler';
 import { DialogRenderer } from '../dialog-renderer';
-import { FrameCommunicator } from '../frameCommunicators/frame-communicator';
 import { HtmlElementAxeResults } from '../scanner-utils';
 import { ShadowUtils } from '../shadow-utils';
 import { DrawerConfiguration, Formatter } from './formatter';
@@ -19,7 +19,7 @@ export class IssuesFormatter implements Formatter {
     private dialogRenderer: DialogRenderer;
 
     constructor(
-        frameCommunicator: FrameCommunicator,
+        frameMessenger: FrameMessenger,
         htmlElementUtils: HTMLElementUtils,
         windowUtils: WindowUtils,
         navigatorUtils: NavigatorUtils,
@@ -31,11 +31,10 @@ export class IssuesFormatter implements Formatter {
         this.dialogRenderer = new DialogRenderer(
             document,
             ReactDOM.render,
-            frameCommunicator,
+            frameMessenger,
             htmlElementUtils,
             windowUtils,
             navigatorUtils,
-            shadowUtils,
             browserAdapter,
             getRTLFunc,
             detailsDialogHandler,

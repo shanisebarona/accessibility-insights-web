@@ -1,9 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import { isEmpty, size } from 'lodash';
-import { css } from 'office-ui-fabric-react';
-import { Dialog, DialogType } from 'office-ui-fabric-react';
-import * as React from 'react';
 
 import { BaseStore } from 'common/base-store';
 import { BrowserAdapter } from 'common/browser-adapters/browser-adapter';
@@ -13,14 +9,18 @@ import {
 } from 'common/components/fix-instruction-panel';
 import { GuidanceLinks } from 'common/components/guidance-links';
 import { NewTabLink } from 'common/components/new-tab-link';
-import { FeatureFlags } from 'common/feature-flags';
 import { CancelIcon } from 'common/icons/cancel-icon';
 import { DevToolActionMessageCreator } from 'common/message-creators/dev-tool-action-message-creator';
 import { HyperlinkDefinition } from 'common/types/hyperlink-definition';
 import { DevToolStoreData } from 'common/types/store-data/dev-tool-store-data';
 import { UserConfigurationStoreData } from 'common/types/store-data/user-configuration-store';
+import { isEmpty, size } from 'lodash';
+import { Dialog, DialogType } from 'office-ui-fabric-react';
+import { css } from 'office-ui-fabric-react';
+import * as React from 'react';
 import { DictionaryStringTo } from 'types/common-types';
 
+import { CheckType } from '../../common/types/check-type';
 import { DetailsDialogHandler } from '../details-dialog-handler';
 import { DecoratedAxeNodeResult } from '../scanner-utils';
 import { TargetPageActionMessageCreator } from '../target-page-action-message-creator';
@@ -29,12 +29,6 @@ import {
     IssueDetailsNavigationControls,
     IssueDetailsNavigationControlsProps,
 } from './issue-details-navigation-controls';
-
-export enum CheckType {
-    All,
-    Any,
-    None,
-}
 
 export type DetailsDialogDeps = {
     targetPageActionMessageCreator: TargetPageActionMessageCreator;
@@ -51,7 +45,6 @@ export interface DetailsDialogProps {
     dialogHandler: DetailsDialogHandler;
     devToolStore: BaseStore<DevToolStoreData>;
     devToolActionMessageCreator: DevToolActionMessageCreator;
-    featureFlagStoreData: DictionaryStringTo<boolean>;
     devToolsShortcut: string;
 }
 
@@ -61,6 +54,7 @@ export interface DetailsDialogState {
     canInspect: boolean;
     userConfigurationStoreData: UserConfigurationStoreData;
     showInspectMessage: boolean;
+    showInsecureOriginPageMessage: boolean;
 }
 
 export class DetailsDialog extends React.Component<DetailsDialogProps, DetailsDialogState> {
@@ -72,6 +66,8 @@ export class DetailsDialog extends React.Component<DetailsDialogProps, DetailsDi
     public isBackButtonDisabled: () => boolean;
     public isNextButtonDisabled: () => boolean;
     public isInspectButtonDisabled: () => boolean;
+    public onClickCopyIssueDetailsButton: (ev) => void;
+    public shouldShowInsecureOriginPageMessage: () => boolean;
 
     constructor(props: DetailsDialogProps) {
         super(props);
@@ -112,13 +108,22 @@ export class DetailsDialog extends React.Component<DetailsDialogProps, DetailsDi
         this.isInspectButtonDisabled = () => {
             return this.props.dialogHandler.isInspectButtonDisabled(this);
         };
-
+        this.onClickCopyIssueDetailsButton = (ev: React.MouseEvent<MouseEvent>) => {
+            this.props.dialogHandler.copyIssueDetailsButtonClickHandler(this, ev);
+        };
+        this.shouldShowInsecureOriginPageMessage = () => {
+            return this.props.dialogHandler.shouldShowInsecureOriginPageMessage(this);
+        };
         this.state = {
             showDialog: true,
             currentRuleIndex: 0,
+            // eslint-disable-next-line react/no-unused-state
             canInspect: true,
+            // eslint-disable-next-line react/no-unused-state
             showInspectMessage: false,
             userConfigurationStoreData: props.userConfigStore.getState(),
+            // eslint-disable-next-line react/no-unused-state
+            showInsecureOriginPageMessage: false,
         };
     }
 
@@ -127,19 +132,37 @@ export class DetailsDialog extends React.Component<DetailsDialogProps, DetailsDi
         const ruleName: string = failedRuleIds[this.state.currentRuleIndex];
         const rule: DecoratedAxeNodeResult = this.props.failedRules[ruleName];
 
-        if (this.props.featureFlagStoreData[FeatureFlags.shadowDialog]) {
-            return this.withshadowDomTurnedOn(rule);
-        } else {
-            return this.withshadowDomTurnedOff(rule);
-        }
-    }
-
-    private getOnClickWhenNotInShadowDom(func: (ev: any) => void): (ev: any) => void {
-        if (this.props.featureFlagStoreData[FeatureFlags.shadowDialog]) {
-            return null;
-        } else {
-            return func;
-        }
+        return (
+            <Dialog
+                hidden={!this.state.showDialog}
+                // Used top button instead of default close button to avoid use of fabric icons that might not load due to target page's Content Security Policy
+                dialogContentProps={{
+                    type: DialogType.normal,
+                    showCloseButton: false,
+                    topButtonsProps: [
+                        {
+                            ariaLabel: 'Close',
+                            onRenderIcon: this.renderCloseIcon,
+                            onClick: this.onHideDialog,
+                        },
+                    ],
+                    styles: { title: 'insights-dialog-title' },
+                }}
+                modalProps={{
+                    isBlocking: false,
+                    containerClassName:
+                        'insights-dialog-main-override insights-dialog-main-container',
+                    layerProps: {
+                        onLayerDidMount: this.onLayoutDidMount,
+                        hostId: 'insights-dialog-layer-host',
+                    },
+                }}
+                onDismiss={this.onHideDialog}
+                title={rule.help}
+            >
+                {this.renderDialogContent(rule)}
+            </Dialog>
+        );
     }
 
     private renderCommandBar(): JSX.Element {
@@ -148,12 +171,13 @@ export class DetailsDialog extends React.Component<DetailsDialogProps, DetailsDi
             deps: this.props.deps,
             devToolsShortcut: this.props.devToolsShortcut,
             failedRules: this.props.failedRules,
-            onClickCopyIssueDetailsButton: this.props.deps.targetPageActionMessageCreator
-                .copyIssueDetailsClicked,
-            onClickInspectButton: this.getOnClickWhenNotInShadowDom(this.onClickInspectButton),
+            onClickCopyIssueDetailsButton: this.onClickCopyIssueDetailsButton,
+            onClickInspectButton: this.onClickInspectButton,
             shouldShowInspectButtonMessage: () =>
                 this.props.dialogHandler.shouldShowInspectButtonMessage(this),
             userConfigurationStoreData: this.state.userConfigurationStoreData,
+            hasSecureTargetPage: this.props.dialogHandler.isTargetPageOriginSecure(),
+            shouldShowInsecureOriginPageMessage: this.shouldShowInsecureOriginPageMessage(),
         };
 
         return <CommandBar {...props} />;
@@ -167,7 +191,6 @@ export class DetailsDialog extends React.Component<DetailsDialogProps, DetailsDi
         const navigationControlsProps: IssueDetailsNavigationControlsProps = {
             container: this,
             dialogHandler: this.props.dialogHandler,
-            featureFlagStoreData: this.props.featureFlagStoreData,
             failuresCount: size(this.props.failedRules),
         };
 
@@ -261,69 +284,6 @@ export class DetailsDialog extends React.Component<DetailsDialogProps, DetailsDi
                 {this.renderFixInstructions(rule)}
                 {this.renderNextAndBackButtons()}
             </div>
-        );
-    }
-
-    private withshadowDomTurnedOn(rule: DecoratedAxeNodeResult): JSX.Element {
-        return (
-            <div
-                style={{ visibility: this.state.showDialog ? 'visible' : 'hidden' }}
-                className="insights-dialog-main-override-shadow"
-            >
-                <div className="insights-dialog-container">
-                    <div className="insights-dialog-header">
-                        <p className="ms-Dialog-title insights-dialog-title">{rule.help}</p>
-                        <div className="ms-Dialog-topButton">
-                            <button
-                                type="button"
-                                className="ms-Dialog-button ms-Dialog-button--close ms-Button ms-Button--icon insights-dialog-close"
-                                aria-label="Close"
-                                data-is-focusable="true"
-                            >
-                                <span className="ms-button-flex-container">
-                                    <CancelIcon />
-                                </span>
-                            </button>
-                        </div>
-                    </div>
-
-                    {this.renderDialogContent(rule)}
-                </div>
-            </div>
-        );
-    }
-
-    private withshadowDomTurnedOff(rule: DecoratedAxeNodeResult): JSX.Element {
-        return (
-            <Dialog
-                hidden={!this.state.showDialog}
-                // Used top button instead of default close button to avoid use of fabric icons that might not load due to target page's Content Security Policy
-                dialogContentProps={{
-                    type: DialogType.normal,
-                    showCloseButton: false,
-                    topButtonsProps: [
-                        {
-                            ariaLabel: 'Close',
-                            onRenderIcon: this.renderCloseIcon,
-                            onClick: this.onHideDialog,
-                        },
-                    ],
-                    styles: { title: 'insights-dialog-title' },
-                }}
-                modalProps={{
-                    isBlocking: false,
-                    containerClassName:
-                        'insights-dialog-main-override insights-dialog-main-container',
-                    layerProps: {
-                        onLayerDidMount: this.onLayoutDidMount,
-                        hostId: 'insights-dialog-layer-host',
-                    },
-                }}
-                onDismiss={this.onHideDialog}
-                title={rule.help}
-            >
-                {this.renderDialogContent(rule)}
-            </Dialog>
         );
     }
 }

@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import * as React from 'react';
 
 import { VisualizationType } from 'common/types/visualization-type';
 import { test as content } from 'content/test';
+import * as React from 'react';
 import { AssessmentBuilder } from '../assessment-builder';
 import { Assessment } from '../types/iassessment';
 import { Contrast } from './test-steps/contrast';
@@ -14,7 +14,7 @@ import { Reflow } from './test-steps/reflow';
 import { ResizeText } from './test-steps/resize-text';
 import { TextSpacing } from './test-steps/text-spacing';
 
-const key = 'textLegibility'; // keeping this as the key for backwards compatability sake, since the test was originally called text legibility
+const key = 'textLegibility'; // keeping this as the key for backward compatability, since the test was originally called text legibility
 const title = 'Adaptable content';
 const { guidance } = content.adaptableContent;
 

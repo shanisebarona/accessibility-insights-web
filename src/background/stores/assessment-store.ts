@@ -12,7 +12,6 @@ import {
     AssessmentData,
     AssessmentStoreData,
     GeneratedAssessmentInstance,
-    InstanceIdToInstanceDataMap,
     TestStepResult,
     UserCapturedInstance,
 } from 'common/types/store-data/assessment-result-data';
@@ -27,8 +26,8 @@ import { DictionaryStringTo } from 'types/common-types';
 import {
     AddResultDescriptionPayload,
     ExpandTestNavPayload,
-    SelectTestSubviewPayload,
     LoadAssessmentPayload,
+    SelectTestSubviewPayload,
 } from '../actions/action-payloads';
 import { AssessmentDataConverter } from '../assessment-data-converter';
 import { InitialAssessmentStoreDataGenerator } from '../initial-assessment-store-data-generator';
@@ -62,7 +61,7 @@ export class AssessmentStore extends BaseStoreImpl<AssessmentStoreData> {
         super(StoreNames.AssessmentStore);
     }
 
-    public generateDefaultState(persistedData: AssessmentStoreData = null): AssessmentStoreData {
+    private generateDefaultState(persistedData: AssessmentStoreData = null): AssessmentStoreData {
         return this.initialAssessmentStoreDataGenerator.generateInitialState(persistedData);
     }
 
@@ -150,7 +149,10 @@ export class AssessmentStore extends BaseStoreImpl<AssessmentStoreData> {
     };
 
     private onLoadAssessment = (payload: LoadAssessmentPayload): void => {
-        //update state - ADO #1784187
+        this.state = this.initialAssessmentStoreDataGenerator.generateInitialState(
+            payload.versionedAssessmentData.assessmentData,
+        );
+        this.updateTargetTabWithId(payload.tabId);
     };
 
     private onUpdateTargetTabId = (tabId: number): void => {
@@ -251,11 +253,12 @@ export class AssessmentStore extends BaseStoreImpl<AssessmentStoreData> {
             .forType(payload.test)
             .getVisualizationConfiguration();
         const assessmentData = config.getAssessmentData(this.state);
-        const newInstance: UserCapturedInstance = this.assessmentDataConverter.generateFailureInstance(
-            payload.instanceData.failureDescription,
-            payload.instanceData.path,
-            payload.instanceData.snippet,
-        );
+        const newInstance: UserCapturedInstance =
+            this.assessmentDataConverter.generateFailureInstance(
+                payload.instanceData.failureDescription,
+                payload.instanceData.path,
+                payload.instanceData.snippet,
+            );
         assessmentData.manualTestStepResultMap[payload.requirement].instances.push(newInstance);
         this.updateManualTestStepStatus(assessmentData, payload.requirement, payload.test);
 
@@ -272,8 +275,9 @@ export class AssessmentStore extends BaseStoreImpl<AssessmentStoreData> {
     ): void => {
         const { test, requirement } = payload;
         const config = this.assessmentsProvider.forType(test).getVisualizationConfiguration();
-        const assessmentDataMap = config.getAssessmentData(this.state)
-            .generatedAssessmentInstancesMap;
+        const assessmentDataMap = config.getAssessmentData(
+            this.state,
+        ).generatedAssessmentInstancesMap;
 
         forEach(assessmentDataMap, val => {
             const stepResult = val.testStepResults[requirement];
@@ -384,14 +388,15 @@ export class AssessmentStore extends BaseStoreImpl<AssessmentStoreData> {
         const stepConfig = this.assessmentsProvider.getStep(test, step);
         const assessmentData = config.getAssessmentData(this.state);
         const { generatedAssessmentInstancesMap: currentGeneratedMap } = assessmentData;
-        const generatedAssessmentInstancesMap = this.assessmentDataConverter.generateAssessmentInstancesMap(
-            currentGeneratedMap,
-            payload.selectorMap,
-            step,
-            config.getInstanceIdentiferGenerator(step),
-            stepConfig.getInstanceStatus,
-            stepConfig.isVisualizationSupportedForResult,
-        );
+        const generatedAssessmentInstancesMap =
+            this.assessmentDataConverter.generateAssessmentInstancesMap(
+                currentGeneratedMap,
+                payload.selectorMap,
+                step,
+                config.getInstanceIdentiferGenerator(step),
+                stepConfig.getInstanceStatus,
+                stepConfig.isVisualizationSupportedForResult,
+            );
         assessmentData.generatedAssessmentInstancesMap = generatedAssessmentInstancesMap;
         assessmentData.testStepStatus[step].isStepScanned = true;
         assessmentData.scanIncompleteWarnings = payload.scanIncompleteWarnings;
@@ -405,12 +410,13 @@ export class AssessmentStore extends BaseStoreImpl<AssessmentStoreData> {
         const config = this.assessmentsProvider.forType(test).getVisualizationConfiguration();
         const assessmentData = config.getAssessmentData(this.state);
         const { generatedAssessmentInstancesMap: currentGeneratedMap } = assessmentData;
-        const generatedAssessmentInstancesMap = this.assessmentDataConverter.generateAssessmentInstancesMapForEvents(
-            currentGeneratedMap,
-            payload.results,
-            step,
-            config.getInstanceIdentiferGenerator(step),
-        );
+        const generatedAssessmentInstancesMap =
+            this.assessmentDataConverter.generateAssessmentInstancesMapForEvents(
+                currentGeneratedMap,
+                payload.results,
+                step,
+                config.getInstanceIdentiferGenerator(step),
+            );
         assessmentData.generatedAssessmentInstancesMap = generatedAssessmentInstancesMap;
         this.updateTestStepStatusOnScanUpdate(assessmentData, step, test);
         this.emitChanged();

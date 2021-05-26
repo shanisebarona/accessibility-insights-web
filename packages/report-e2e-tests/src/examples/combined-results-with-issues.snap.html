@@ -132,7 +132,7 @@
       .ms-Fabric.is-focusVisible .ms-Nav-group .ms-nav-linkButton:focus::after {
         border: 1px solid var(--neutral-100);
       }
-      @media screen and (-ms-high-contrast: active) {
+      @media screen and (forced-colors: active) {
         .ms-Fabric.is-focusVisible
           .ms-Nav-group
           .ms-nav-linkButton:focus::after {
@@ -932,24 +932,6 @@
         height: 1px;
         overflow: hidden;
       }
-      .toast-container--YaZxW {
-        display: inline-block;
-      }
-      .toast-content--Wt0Lj {
-        background: var(--neutral-70);
-        border-radius: 4px;
-        color: var(--neutral-0);
-        padding-left: 20px;
-        padding-top: 14px;
-        padding-bottom: 14px;
-        padding-right: 20px;
-        width: 316px;
-        margin-left: calc(316px / -2 - 20px);
-        left: 50%;
-        bottom: 20px;
-        z-index: 1000;
-        position: absolute;
-      }
       .how-to-fix-content--2-Pc1 {
         margin-bottom: 16px;
       }
@@ -999,6 +981,24 @@
         + .action-cancel-button-col--2EdOO {
         margin-left: 8px;
       }
+      .toast-container--YaZxW {
+        display: inline-block;
+      }
+      .toast-content--Wt0Lj {
+        background: var(--neutral-70);
+        border-radius: 4px;
+        color: var(--neutral-0);
+        padding-left: 20px;
+        padding-top: 14px;
+        padding-bottom: 14px;
+        padding-right: 20px;
+        width: 316px;
+        margin-left: calc(316px / -2 - 20px);
+        left: 50%;
+        bottom: 20px;
+        z-index: 1000;
+        position: absolute;
+      }
       div.kebab-menu-callout--14fgT {
         box-shadow: 0px 6.4px 14.4px var(--box-shadow-132),
           0px 1.2px 3.6px var(--box-shadow-108);
@@ -1038,7 +1038,7 @@
       button.kebab-menu-button--2aa2O svg {
         stroke: var(--primary-text);
       }
-      @media screen and (-ms-high-contrast: active) {
+      @media screen and (forced-colors: active) {
         button.kebab-menu-button--2aa2O svg {
           fill: inherit !important;
         }
@@ -1692,6 +1692,7 @@
             class="outcome-summary-bar"
             aria-label="3 Failed, 1 Not scanned, 2 Passed"
             role="img"
+            data-automation-id="outcome-summary-bar"
             ><div style="flex-grow: 3"
               ><span class="fail summary-bar-left-edge"
                 ><span aria-hidden="true"
@@ -1790,23 +1791,27 @@
                 ><button
                   class="collapsible-control"
                   aria-expanded="false"
-                  aria-controls="content-container-undefined"
+                  aria-controls="content-container-combined-report-failed-section"
                   ><span class="combined-report-result-section-title--3lkTt"
-                    ><span class="screen-reader-only">Failed 2</span
+                    ><span class="screen-reader-only">Failed rules 2</span
                     ><span class="heading--AZCs6" aria-hidden="true"
-                      >Failed (2)</span
+                      >Failed rules (2)</span
                     ></span
                   ></button
                 ></div
               ><div
-                id="content-container-undefined"
+                id="content-container-combined-report-failed-section"
                 class="collapsible-content"
                 aria-hidden="true"
                 ><div
                   class="rule-details-group--39A1d"
                   data-automation-id="rule-details-group"
                   ><div
-                    class="collapsible-container collapsible-rule-details-group--3aN3u collapsed"
+                    class="
+                      collapsible-container
+                      collapsible-rule-details-group--3aN3u
+                      collapsed
+                    "
                     ><div class="title-container" role="heading" aria-level="4"
                       ><button
                         class="collapsible-control"
@@ -1911,9 +1916,8 @@
                               >WCAG 2.4.1</a
                             ><script>
                               (function (linkId, doc, confirmCallback) {
-                                const targetPageLink = doc.getElementById(
-                                  linkId
-                                );
+                                const targetPageLink =
+                                  doc.getElementById(linkId);
                                 targetPageLink.addEventListener(
                                   "click",
                                   function (event) {
@@ -1955,7 +1959,11 @@
                                             ><a
                                               target="_blank"
                                               href="https://url/rule-1/failure-1"
-                                              class="ms-Link insights-link root-49"
+                                              class="
+                                                ms-Link
+                                                insights-link
+                                                root-49
+                                              "
                                               id="new-tab-link-with-confirmation-dialog__3"
                                               >https://url/rule-1/failure-1</a
                                             ><script>
@@ -1964,17 +1972,17 @@
                                                 doc,
                                                 confirmCallback
                                               ) {
-                                                const targetPageLink = doc.getElementById(
-                                                  linkId
-                                                );
+                                                const targetPageLink =
+                                                  doc.getElementById(linkId);
                                                 targetPageLink.addEventListener(
                                                   "click",
                                                   function (event) {
-                                                    const result = confirmCallback(
-                                                      "Are you sure you want to navigate away from the Accessibility Insights report?\n" +
-                                                        "This link will open the target page in a new tab.\n\nPress OK to continue or " +
-                                                        "Cancel to stay on the current page."
-                                                    );
+                                                    const result =
+                                                      confirmCallback(
+                                                        "Are you sure you want to navigate away from the Accessibility Insights report?\n" +
+                                                          "This link will open the target page in a new tab.\n\nPress OK to continue or " +
+                                                          "Cancel to stay on the current page."
+                                                      );
                                                     if (result === false) {
                                                       event.preventDefault();
                                                     }
@@ -1997,7 +2005,10 @@
                                     ><tr class="row--kaG63"
                                       ><th class="row-label--1iEmL">Snippet</th
                                       ><td
-                                        class="row-content--usdIW snippet--msVz-"
+                                        class="
+                                          row-content--usdIW
+                                          snippet--msVz-
+                                        "
                                         >&lt;div&gt;snippet 1&lt;/div&gt;</td
                                       ></tr
                                     ><tr class="row--kaG63"
@@ -2008,7 +2019,9 @@
                                           ><div
                                             ><div>Fix ONE of the following:</div
                                             ><ul
-                                              class="insights-fix-instruction-list--1vUZj"
+                                              class="
+                                                insights-fix-instruction-list--1vUZj
+                                              "
                                               ><li>No valid skip link found</li
                                               ><li
                                                 >Page does not have a header</li
@@ -2042,7 +2055,11 @@
                                             ><a
                                               target="_blank"
                                               href="https://url/rule-1/failure-1"
-                                              class="ms-Link insights-link root-49"
+                                              class="
+                                                ms-Link
+                                                insights-link
+                                                root-49
+                                              "
                                               id="new-tab-link-with-confirmation-dialog__4"
                                               >https://url/rule-1/failure-1</a
                                             ><script>
@@ -2051,17 +2068,17 @@
                                                 doc,
                                                 confirmCallback
                                               ) {
-                                                const targetPageLink = doc.getElementById(
-                                                  linkId
-                                                );
+                                                const targetPageLink =
+                                                  doc.getElementById(linkId);
                                                 targetPageLink.addEventListener(
                                                   "click",
                                                   function (event) {
-                                                    const result = confirmCallback(
-                                                      "Are you sure you want to navigate away from the Accessibility Insights report?\n" +
-                                                        "This link will open the target page in a new tab.\n\nPress OK to continue or " +
-                                                        "Cancel to stay on the current page."
-                                                    );
+                                                    const result =
+                                                      confirmCallback(
+                                                        "Are you sure you want to navigate away from the Accessibility Insights report?\n" +
+                                                          "This link will open the target page in a new tab.\n\nPress OK to continue or " +
+                                                          "Cancel to stay on the current page."
+                                                      );
                                                     if (result === false) {
                                                       event.preventDefault();
                                                     }
@@ -2077,7 +2094,11 @@
                                             ><a
                                               target="_blank"
                                               href="https://url/rule1/failure-2"
-                                              class="ms-Link insights-link root-49"
+                                              class="
+                                                ms-Link
+                                                insights-link
+                                                root-49
+                                              "
                                               id="new-tab-link-with-confirmation-dialog__5"
                                               >https://url/rule1/failure-2</a
                                             ><script>
@@ -2086,17 +2107,17 @@
                                                 doc,
                                                 confirmCallback
                                               ) {
-                                                const targetPageLink = doc.getElementById(
-                                                  linkId
-                                                );
+                                                const targetPageLink =
+                                                  doc.getElementById(linkId);
                                                 targetPageLink.addEventListener(
                                                   "click",
                                                   function (event) {
-                                                    const result = confirmCallback(
-                                                      "Are you sure you want to navigate away from the Accessibility Insights report?\n" +
-                                                        "This link will open the target page in a new tab.\n\nPress OK to continue or " +
-                                                        "Cancel to stay on the current page."
-                                                    );
+                                                    const result =
+                                                      confirmCallback(
+                                                        "Are you sure you want to navigate away from the Accessibility Insights report?\n" +
+                                                          "This link will open the target page in a new tab.\n\nPress OK to continue or " +
+                                                          "Cancel to stay on the current page."
+                                                      );
                                                     if (result === false) {
                                                       event.preventDefault();
                                                     }
@@ -2119,7 +2140,10 @@
                                     ><tr class="row--kaG63"
                                       ><th class="row-label--1iEmL">Snippet</th
                                       ><td
-                                        class="row-content--usdIW snippet--msVz-"
+                                        class="
+                                          row-content--usdIW
+                                          snippet--msVz-
+                                        "
                                         >&lt;div&gt;snippet 2&lt;/div&gt;</td
                                       ></tr
                                     ><tr class="row--kaG63"
@@ -2130,7 +2154,9 @@
                                           ><div
                                             ><div>Fix ONE of the following:</div
                                             ><ul
-                                              class="insights-fix-instruction-list--1vUZj"
+                                              class="
+                                                insights-fix-instruction-list--1vUZj
+                                              "
                                               ><li>No valid skip link found</li
                                               ><li
                                                 >Page does not have a header</li
@@ -2152,7 +2178,11 @@
                       ></div
                     ></div
                   ><div
-                    class="collapsible-container collapsible-rule-details-group--3aN3u collapsed"
+                    class="
+                      collapsible-container
+                      collapsible-rule-details-group--3aN3u
+                      collapsed
+                    "
                     ><div class="title-container" role="heading" aria-level="4"
                       ><button
                         class="collapsible-control"
@@ -2257,9 +2287,8 @@
                               >WCAG 1.4.3</a
                             ><script>
                               (function (linkId, doc, confirmCallback) {
-                                const targetPageLink = doc.getElementById(
-                                  linkId
-                                );
+                                const targetPageLink =
+                                  doc.getElementById(linkId);
                                 targetPageLink.addEventListener(
                                   "click",
                                   function (event) {
@@ -2301,7 +2330,11 @@
                                             ><a
                                               target="_blank"
                                               href="https://url/rule2/failure1"
-                                              class="ms-Link insights-link root-49"
+                                              class="
+                                                ms-Link
+                                                insights-link
+                                                root-49
+                                              "
                                               id="new-tab-link-with-confirmation-dialog__8"
                                               >https://url/rule2/failure1</a
                                             ><script>
@@ -2310,17 +2343,17 @@
                                                 doc,
                                                 confirmCallback
                                               ) {
-                                                const targetPageLink = doc.getElementById(
-                                                  linkId
-                                                );
+                                                const targetPageLink =
+                                                  doc.getElementById(linkId);
                                                 targetPageLink.addEventListener(
                                                   "click",
                                                   function (event) {
-                                                    const result = confirmCallback(
-                                                      "Are you sure you want to navigate away from the Accessibility Insights report?\n" +
-                                                        "This link will open the target page in a new tab.\n\nPress OK to continue or " +
-                                                        "Cancel to stay on the current page."
-                                                    );
+                                                    const result =
+                                                      confirmCallback(
+                                                        "Are you sure you want to navigate away from the Accessibility Insights report?\n" +
+                                                          "This link will open the target page in a new tab.\n\nPress OK to continue or " +
+                                                          "Cancel to stay on the current page."
+                                                      );
                                                     if (result === false) {
                                                       event.preventDefault();
                                                     }
@@ -2343,7 +2376,10 @@
                                     ><tr class="row--kaG63"
                                       ><th class="row-label--1iEmL">Snippet</th
                                       ><td
-                                        class="row-content--usdIW snippet--msVz-"
+                                        class="
+                                          row-content--usdIW
+                                          snippet--msVz-
+                                        "
                                         >&lt;div&gt;snippet&lt;/div&gt;</td
                                       ></tr
                                     ><tr class="row--kaG63"
@@ -2354,7 +2390,9 @@
                                           ><div
                                             ><div>Fix the following:</div
                                             ><ul
-                                              class="insights-fix-instruction-list--1vUZj"
+                                              class="
+                                                insights-fix-instruction-list--1vUZj
+                                              "
                                               ><li
                                                 ><span aria-hidden="true"
                                                   ><span
@@ -2362,7 +2400,9 @@
                                                     color contrast of 2.52
                                                     (foreground color: </span
                                                   ><span
-                                                    class="fix-instruction-color-box--HXJ1A"
+                                                    class="
+                                                      fix-instruction-color-box--HXJ1A
+                                                    "
                                                     style="
                                                       background-color: #8a94a8;
                                                     "
@@ -2370,7 +2410,9 @@
                                                   ><span
                                                     >#8a94a8, background color: </span
                                                   ><span
-                                                    class="fix-instruction-color-box--HXJ1A"
+                                                    class="
+                                                      fix-instruction-color-box--HXJ1A
+                                                    "
                                                     style="
                                                       background-color: #e7ecd8;
                                                     "
@@ -2382,7 +2424,9 @@
                                                     ratio of 4.5:1</span
                                                   ></span
                                                 ><span
-                                                  class="screen-reader-only--1uWLQ"
+                                                  class="
+                                                    screen-reader-only--1uWLQ
+                                                  "
                                                   >Element has insufficient
                                                   color contrast of 2.52
                                                   (foreground color: #8a94a8,
@@ -2415,180 +2459,11 @@
                 ><button
                   class="collapsible-control"
                   aria-expanded="false"
-                  aria-controls="content-container-inapplicable-checks-section"
-                  ><span class="combined-report-result-section-title--3lkTt"
-                    ><span class="screen-reader-only">Not applicable 3</span
-                    ><span class="heading--AZCs6" aria-hidden="true"
-                      >Not applicable (3)</span
-                    ></span
-                  ></button
-                ></div
-              ><div
-                id="content-container-inapplicable-checks-section"
-                class="collapsible-content"
-                aria-hidden="true"
-                ><div class="rule-details-group--39A1d"
-                  ><div class="rule-detail"
-                    ><div>
-                      <span class="rule-details-id"
-                        ><a
-                          target="_blank"
-                          href="https://accessibilityinsights.io/info-examples/web/aria-input-field-name"
-                          class="ms-Link insights-link root-49"
-                          aria-label="rule aria-input-field-name"
-                          aria-describedby="not-applicable-rule-aria-input-field-name-description"
-                          >aria-input-field-name</a
-                        ></span
-                      >:
-                      <span
-                        class="rule-details-description"
-                        id="not-applicable-rule-aria-input-field-name-description"
-                        >Ensures every ARIA input field has an accessible
-                        name</span
-                      >(<span class="guidance-links"
-                        ><a
-                          target="_blank"
-                          href="https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html"
-                          class="ms-Link insights-link root-49"
-                          id="new-tab-link-with-confirmation-dialog__9"
-                          >WCAG 4.1.2</a
-                        ><script>
-                          (function (linkId, doc, confirmCallback) {
-                            const targetPageLink = doc.getElementById(linkId);
-                            targetPageLink.addEventListener(
-                              "click",
-                              function (event) {
-                                const result = confirmCallback(
-                                  "Are you sure you want to navigate away from the Accessibility Insights report?\n" +
-                                    "This link will open the target page in a new tab.\n\nPress OK to continue or " +
-                                    "Cancel to stay on the current page."
-                                );
-                                if (result === false) {
-                                  event.preventDefault();
-                                }
-                              }
-                            );
-                          })(
-                            "new-tab-link-with-confirmation-dialog__9",
-                            document,
-                            confirm
-                          );
-                        </script></span
-                      >)</div
-                    ></div
-                  ><div class="rule-detail"
-                    ><div>
-                      <span class="rule-details-id"
-                        ><a
-                          target="_blank"
-                          href="https://accessibilityinsights.io/info-examples/web/aria-toggle-field-name"
-                          class="ms-Link insights-link root-49"
-                          aria-label="rule aria-toggle-field-name"
-                          aria-describedby="not-applicable-rule-aria-toggle-field-name-description"
-                          >aria-toggle-field-name</a
-                        ></span
-                      >:
-                      <span
-                        class="rule-details-description"
-                        id="not-applicable-rule-aria-toggle-field-name-description"
-                        >Ensures every ARIA toggle field has an accessible
-                        name</span
-                      >(<span class="guidance-links"
-                        ><a
-                          target="_blank"
-                          href="https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html"
-                          class="ms-Link insights-link root-49"
-                          id="new-tab-link-with-confirmation-dialog__10"
-                          >WCAG 4.1.2</a
-                        ><script>
-                          (function (linkId, doc, confirmCallback) {
-                            const targetPageLink = doc.getElementById(linkId);
-                            targetPageLink.addEventListener(
-                              "click",
-                              function (event) {
-                                const result = confirmCallback(
-                                  "Are you sure you want to navigate away from the Accessibility Insights report?\n" +
-                                    "This link will open the target page in a new tab.\n\nPress OK to continue or " +
-                                    "Cancel to stay on the current page."
-                                );
-                                if (result === false) {
-                                  event.preventDefault();
-                                }
-                              }
-                            );
-                          })(
-                            "new-tab-link-with-confirmation-dialog__10",
-                            document,
-                            confirm
-                          );
-                        </script></span
-                      >)</div
-                    ></div
-                  ><div class="rule-detail"
-                    ><div>
-                      <span class="rule-details-id"
-                        ><a
-                          target="_blank"
-                          href="https://accessibilityinsights.io/info-examples/web/autocomplete-valid"
-                          class="ms-Link insights-link root-49"
-                          aria-label="rule autocomplete-valid"
-                          aria-describedby="not-applicable-rule-autocomplete-valid-description"
-                          >autocomplete-valid</a
-                        ></span
-                      >:
-                      <span
-                        class="rule-details-description"
-                        id="not-applicable-rule-autocomplete-valid-description"
-                        >Ensure the autocomplete attribute is correct and
-                        suitable for the form field</span
-                      >(<span class="guidance-links"
-                        ><a
-                          target="_blank"
-                          href="https://www.w3.org/WAI/WCAG21/Understanding/identify-input-purpose.html"
-                          class="ms-Link insights-link root-49"
-                          id="new-tab-link-with-confirmation-dialog__11"
-                          >WCAG 1.3.5</a
-                        ><script>
-                          (function (linkId, doc, confirmCallback) {
-                            const targetPageLink = doc.getElementById(linkId);
-                            targetPageLink.addEventListener(
-                              "click",
-                              function (event) {
-                                const result = confirmCallback(
-                                  "Are you sure you want to navigate away from the Accessibility Insights report?\n" +
-                                    "This link will open the target page in a new tab.\n\nPress OK to continue or " +
-                                    "Cancel to stay on the current page."
-                                );
-                                if (result === false) {
-                                  event.preventDefault();
-                                }
-                              }
-                            );
-                          })(
-                            "new-tab-link-with-confirmation-dialog__11",
-                            document,
-                            confirm
-                          );
-                        </script></span
-                      >)<span class="guidance-tags"
-                        ><span>New for WCAG 2.1</span></span
-                      ></div
-                    ></div
-                  ></div
-                ></div
-              ></div
-            ></div
-          ><div class="result-section"
-            ><div class="collapsible-container collapsed"
-              ><div class="title-container" role="heading" aria-level="3"
-                ><button
-                  class="collapsible-control"
-                  aria-expanded="false"
                   aria-controls="content-container-pass-checks-section"
                   ><span class="combined-report-result-section-title--3lkTt"
-                    ><span class="screen-reader-only">Passed 2</span
+                    ><span class="screen-reader-only">Passed rules 2</span
                     ><span class="heading--AZCs6" aria-hidden="true"
-                      >Passed (2)</span
+                      >Passed rules (2)</span
                     ></span
                   ></button
                 ></div
@@ -2619,8 +2494,156 @@
                           target="_blank"
                           href="https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html"
                           class="ms-Link insights-link root-49"
-                          id="new-tab-link-with-confirmation-dialog__12"
+                          id="new-tab-link-with-confirmation-dialog__9"
                           >WCAG 1.1.1</a
+                        ><script>
+                          (function (linkId, doc, confirmCallback) {
+                            const targetPageLink = doc.getElementById(linkId);
+                            targetPageLink.addEventListener(
+                              "click",
+                              function (event) {
+                                const result = confirmCallback(
+                                  "Are you sure you want to navigate away from the Accessibility Insights report?\n" +
+                                    "This link will open the target page in a new tab.\n\nPress OK to continue or " +
+                                    "Cancel to stay on the current page."
+                                );
+                                if (result === false) {
+                                  event.preventDefault();
+                                }
+                              }
+                            );
+                          })(
+                            "new-tab-link-with-confirmation-dialog__9",
+                            document,
+                            confirm
+                          );
+                        </script></span
+                      >)</div
+                    ></div
+                  ><div class="rule-detail"
+                    ><div>
+                      <span class="rule-details-id"
+                        ><a
+                          target="_blank"
+                          href="https://accessibilityinsights.io/info-examples/web/aria-hidden-focus"
+                          class="ms-Link insights-link root-49"
+                          aria-label="rule aria-hidden-focus"
+                          aria-describedby="passed-rule-aria-hidden-focus-description"
+                          >aria-hidden-focus</a
+                        ></span
+                      >:
+                      <span
+                        class="rule-details-description"
+                        id="passed-rule-aria-hidden-focus-description"
+                        >Ensures aria-hidden elements do not contain focusable
+                        elements</span
+                      >(<span class="guidance-links"
+                        ><a
+                          target="_blank"
+                          href="https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships"
+                          class="ms-Link insights-link root-49"
+                          id="new-tab-link-with-confirmation-dialog__10"
+                          >WCAG 1.3.1</a
+                        ><script>
+                          (function (linkId, doc, confirmCallback) {
+                            const targetPageLink = doc.getElementById(linkId);
+                            targetPageLink.addEventListener(
+                              "click",
+                              function (event) {
+                                const result = confirmCallback(
+                                  "Are you sure you want to navigate away from the Accessibility Insights report?\n" +
+                                    "This link will open the target page in a new tab.\n\nPress OK to continue or " +
+                                    "Cancel to stay on the current page."
+                                );
+                                if (result === false) {
+                                  event.preventDefault();
+                                }
+                              }
+                            );
+                          })(
+                            "new-tab-link-with-confirmation-dialog__10",
+                            document,
+                            confirm
+                          );</script
+                        ><span>, </span
+                        ><a
+                          target="_blank"
+                          href="https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html"
+                          class="ms-Link insights-link root-49"
+                          id="new-tab-link-with-confirmation-dialog__11"
+                          >WCAG 4.1.2</a
+                        ><script>
+                          (function (linkId, doc, confirmCallback) {
+                            const targetPageLink = doc.getElementById(linkId);
+                            targetPageLink.addEventListener(
+                              "click",
+                              function (event) {
+                                const result = confirmCallback(
+                                  "Are you sure you want to navigate away from the Accessibility Insights report?\n" +
+                                    "This link will open the target page in a new tab.\n\nPress OK to continue or " +
+                                    "Cancel to stay on the current page."
+                                );
+                                if (result === false) {
+                                  event.preventDefault();
+                                }
+                              }
+                            );
+                          })(
+                            "new-tab-link-with-confirmation-dialog__11",
+                            document,
+                            confirm
+                          );
+                        </script></span
+                      >)</div
+                    ></div
+                  ></div
+                ></div
+              ></div
+            ></div
+          ><div class="result-section"
+            ><div class="collapsible-container collapsed"
+              ><div class="title-container" role="heading" aria-level="3"
+                ><button
+                  class="collapsible-control"
+                  aria-expanded="false"
+                  aria-controls="content-container-inapplicable-checks-section"
+                  ><span class="combined-report-result-section-title--3lkTt"
+                    ><span class="screen-reader-only"
+                      >Not applicable rules 3</span
+                    ><span class="heading--AZCs6" aria-hidden="true"
+                      >Not applicable rules (3)</span
+                    ></span
+                  ></button
+                ></div
+              ><div
+                id="content-container-inapplicable-checks-section"
+                class="collapsible-content"
+                aria-hidden="true"
+                ><div class="rule-details-group--39A1d"
+                  ><div class="rule-detail"
+                    ><div>
+                      <span class="rule-details-id"
+                        ><a
+                          target="_blank"
+                          href="https://accessibilityinsights.io/info-examples/web/aria-input-field-name"
+                          class="ms-Link insights-link root-49"
+                          aria-label="rule aria-input-field-name"
+                          aria-describedby="not-applicable-rule-aria-input-field-name-description"
+                          >aria-input-field-name</a
+                        ></span
+                      >:
+                      <span
+                        class="rule-details-description"
+                        id="not-applicable-rule-aria-input-field-name-description"
+                        >Ensures every ARIA input field has an accessible
+                        name</span
+                      >(<span class="guidance-links"
+                        ><a
+                          target="_blank"
+                          href="https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html"
+                          class="ms-Link insights-link root-49"
+                          id="new-tab-link-with-confirmation-dialog__12"
+                          >WCAG 4.1.2</a
                         ><script>
                           (function (linkId, doc, confirmCallback) {
                             const targetPageLink = doc.getElementById(linkId);
@@ -2650,25 +2673,25 @@
                       <span class="rule-details-id"
                         ><a
                           target="_blank"
-                          href="https://accessibilityinsights.io/info-examples/web/aria-hidden-focus"
+                          href="https://accessibilityinsights.io/info-examples/web/aria-toggle-field-name"
                           class="ms-Link insights-link root-49"
-                          aria-label="rule aria-hidden-focus"
-                          aria-describedby="passed-rule-aria-hidden-focus-description"
-                          >aria-hidden-focus</a
+                          aria-label="rule aria-toggle-field-name"
+                          aria-describedby="not-applicable-rule-aria-toggle-field-name-description"
+                          >aria-toggle-field-name</a
                         ></span
                       >:
                       <span
                         class="rule-details-description"
-                        id="passed-rule-aria-hidden-focus-description"
-                        >Ensures aria-hidden elements do not contain focusable
-                        elements</span
+                        id="not-applicable-rule-aria-toggle-field-name-description"
+                        >Ensures every ARIA toggle field has an accessible
+                        name</span
                       >(<span class="guidance-links"
                         ><a
                           target="_blank"
-                          href="https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships"
+                          href="https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html"
                           class="ms-Link insights-link root-49"
                           id="new-tab-link-with-confirmation-dialog__13"
-                          >WCAG 1.3.1</a
+                          >WCAG 4.1.2</a
                         ><script>
                           (function (linkId, doc, confirmCallback) {
                             const targetPageLink = doc.getElementById(linkId);
@@ -2689,14 +2712,34 @@
                             "new-tab-link-with-confirmation-dialog__13",
                             document,
                             confirm
-                          );</script
-                        ><span>, </span
+                          );
+                        </script></span
+                      >)</div
+                    ></div
+                  ><div class="rule-detail"
+                    ><div>
+                      <span class="rule-details-id"
                         ><a
                           target="_blank"
-                          href="https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html"
+                          href="https://accessibilityinsights.io/info-examples/web/autocomplete-valid"
+                          class="ms-Link insights-link root-49"
+                          aria-label="rule autocomplete-valid"
+                          aria-describedby="not-applicable-rule-autocomplete-valid-description"
+                          >autocomplete-valid</a
+                        ></span
+                      >:
+                      <span
+                        class="rule-details-description"
+                        id="not-applicable-rule-autocomplete-valid-description"
+                        >Ensure the autocomplete attribute is correct and
+                        suitable for the form field</span
+                      >(<span class="guidance-links"
+                        ><a
+                          target="_blank"
+                          href="https://www.w3.org/WAI/WCAG21/Understanding/identify-input-purpose.html"
                           class="ms-Link insights-link root-49"
                           id="new-tab-link-with-confirmation-dialog__14"
-                          >WCAG 4.1.2</a
+                          >WCAG 1.3.5</a
                         ><script>
                           (function (linkId, doc, confirmCallback) {
                             const targetPageLink = doc.getElementById(linkId);
@@ -2719,7 +2762,9 @@
                             confirm
                           );
                         </script></span
-                      >)</div
+                      >)<span class="guidance-tags"
+                        ><span>New for WCAG 2.1</span></span
+                      ></div
                     ></div
                   ></div
                 ></div
@@ -2772,8 +2817,9 @@
       ><div class="report-footer" role="contentinfo"
         >This automated checks result was generated using the Mock Service Name
         that helps find some of the most common accessibility issues. The scan
-        was performed using axe-core mock.axe.version and Mock user agent. For a
-        complete WCAG 2.1 compliance assessment please visit
+        was performed in a clean browser environment, using axe-core
+        mock.axe.version and Mock user agent with a display resolution of
+        1920x1080. For a complete WCAG 2.1 compliance assessment please visit
         <a
           target="_blank"
           href="http://aka.ms/AccessibilityInsights"

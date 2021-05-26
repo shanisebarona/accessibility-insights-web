@@ -5,7 +5,6 @@ import { Dialog } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { Mock, Times } from 'typemoq';
 
-import { FeatureFlags } from '../../../../../common/feature-flags';
 import { CommandBar } from '../../../../../injected/components/command-bar';
 import {
     DetailsDialog,
@@ -13,13 +12,11 @@ import {
     DetailsDialogProps,
 } from '../../../../../injected/components/details-dialog';
 import { DecoratedAxeNodeResult } from '../../../../../injected/scanner-utils';
-import { TargetPageActionMessageCreator } from '../../../../../injected/target-page-action-message-creator';
 import { DictionaryStringTo } from '../../../../../types/common-types';
 import { EventStubFactory } from '../../../common/event-stub-factory';
 
 type DetailsDialogTestCase = {
     isDevToolsOpen: boolean;
-    shadowDialog: boolean;
     helpUrl?: string;
     expectedHelpUrl?: string;
 };
@@ -66,23 +63,12 @@ describe('DetailsDialog', () => {
         const testCases: DetailsDialogTestCase[] = [
             {
                 isDevToolsOpen: false,
-                shadowDialog: false,
-            },
-            {
-                isDevToolsOpen: false,
-                shadowDialog: true,
             },
             {
                 isDevToolsOpen: true,
-                shadowDialog: false,
-            },
-            {
-                isDevToolsOpen: true,
-                shadowDialog: true,
             },
             {
                 isDevToolsOpen: false,
-                shadowDialog: false,
                 helpUrl: 'help-relative',
                 expectedHelpUrl: 'http://extension/help-relative',
             },
@@ -91,7 +77,6 @@ describe('DetailsDialog', () => {
         test.each(testCases)('with: %p', (testCase: DetailsDialogTestCase) => {
             const {
                 isDevToolsOpen,
-                shadowDialog,
                 helpUrl = 'http://extension/help1',
                 expectedHelpUrl = 'http://extension/help1',
             } = testCase;
@@ -118,9 +103,6 @@ describe('DetailsDialog', () => {
                 deps,
                 failedRules: expectedFailedRules,
                 dialogHandler: dialogDetailsHandlerMockObject as any,
-                featureFlagStoreData: {
-                    [FeatureFlags.shadowDialog]: shadowDialog,
-                },
             };
 
             const wrapper = shallow(<DetailsDialog {...props} />);
@@ -129,20 +111,14 @@ describe('DetailsDialog', () => {
 
             expect(wrapper.state()).toMatchSnapshot('verify initial state');
 
-            if (!shadowDialog) {
-                expect(
-                    wrapper
-                        .find(Dialog)
-                        .props()
-                        .dialogContentProps.topButtonsProps[0].onRenderIcon(),
-                ).toMatchSnapshot('verify close button for non shadow dom');
-            }
+            expect(
+                wrapper.find(Dialog).props().dialogContentProps.topButtonsProps[0].onRenderIcon(),
+            ).toMatchSnapshot('verify close button');
         });
     });
 
     describe('handlers', () => {
         describe('for CommandBar', () => {
-            const shadowDialogEnabled = [true, false];
             const eventStub = new EventStubFactory().createKeypressEvent() as any;
 
             let expectedFailedRules: DictionaryStringTo<DecoratedAxeNodeResult>;
@@ -160,123 +136,103 @@ describe('DetailsDialog', () => {
                 dialogDetailsHandlerMockObject = getDetailsDialogHandlerStub(true);
             });
 
-            test.each(shadowDialogEnabled)(
-                'on click copy issue details button, shadow dialog: %s',
-                shadowDialog => {
-                    const targetPageActionMessageCreatorMock = Mock.ofType<TargetPageActionMessageCreator>();
+            test('on click copy issue details button', () => {
+                const clickHandlerMock = Mock.ofInstance(
+                    (component: DetailsDialog, event: React.MouseEvent<MouseEvent>) => {},
+                );
 
-                    const deps = {
-                        ...defaultDetailsDialogDeps,
-                        browserAdapter: {
-                            getUrl: url => 'test-url',
-                        } as any,
-                        targetPageActionMessageCreator: targetPageActionMessageCreatorMock.object,
-                    };
+                dialogDetailsHandlerMockObject.copyIssueDetailsButtonClickHandler =
+                    clickHandlerMock.object;
 
-                    const props = {
-                        ...defaultDetailsDialogProps,
-                        deps,
-                        featureFlagStoreData: {
-                            [FeatureFlags.shadowDialog]: shadowDialog,
-                        },
-                        failedRules: expectedFailedRules,
-                        dialogHandler: dialogDetailsHandlerMockObject,
-                    };
+                const deps = {
+                    ...defaultDetailsDialogDeps,
+                    browserAdapter: {
+                        getUrl: url => 'test-url',
+                    } as any,
+                };
 
-                    const wrapper = shallow(<DetailsDialog {...props} />);
+                const props = {
+                    ...defaultDetailsDialogProps,
+                    deps,
+                    failedRules: expectedFailedRules,
+                    dialogHandler: dialogDetailsHandlerMockObject,
+                };
 
-                    const commandBar = wrapper.find(CommandBar);
+                const wrapper = shallow<DetailsDialog>(<DetailsDialog {...props} />);
 
-                    commandBar.prop('onClickCopyIssueDetailsButton')(eventStub);
+                const commandBar = wrapper.find(CommandBar);
 
-                    targetPageActionMessageCreatorMock.verify(
-                        creator => creator.copyIssueDetailsClicked(eventStub),
-                        Times.once(),
-                    );
-                },
-            );
+                commandBar.prop('onClickCopyIssueDetailsButton')(eventStub);
 
-            test.each(shadowDialogEnabled)(
-                'on click inspect button, shadow dialog: %s',
-                shadowDialog => {
-                    const clickHandlerMock = Mock.ofInstance(
-                        (component: DetailsDialog, event: React.SyntheticEvent<MouseEvent>) => {},
-                    );
+                clickHandlerMock.verify(
+                    handler => handler(wrapper.instance(), eventStub),
+                    Times.once(),
+                );
+            });
 
-                    dialogDetailsHandlerMockObject.inspectButtonClickHandler =
-                        clickHandlerMock.object;
+            test('on click inspect button', () => {
+                const clickHandlerMock = Mock.ofInstance(
+                    (component: DetailsDialog, event: React.SyntheticEvent<MouseEvent>) => {},
+                );
 
-                    const deps = {
-                        ...defaultDetailsDialogDeps,
-                        browserAdapter: {
-                            getUrl: url => 'test-url',
-                        } as any,
-                    };
+                dialogDetailsHandlerMockObject.inspectButtonClickHandler = clickHandlerMock.object;
 
-                    const props = {
-                        ...defaultDetailsDialogProps,
-                        deps,
-                        featureFlagStoreData: {
-                            [FeatureFlags.shadowDialog]: shadowDialog,
-                        },
-                        failedRules: expectedFailedRules,
-                        dialogHandler: dialogDetailsHandlerMockObject,
-                    };
+                const deps = {
+                    ...defaultDetailsDialogDeps,
+                    browserAdapter: {
+                        getUrl: url => 'test-url',
+                    } as any,
+                };
 
-                    const wrapper = shallow<DetailsDialog>(<DetailsDialog {...props} />);
+                const props = {
+                    ...defaultDetailsDialogProps,
+                    deps,
+                    failedRules: expectedFailedRules,
+                    dialogHandler: dialogDetailsHandlerMockObject,
+                };
 
-                    const commandBar = wrapper.find(CommandBar);
-                    const onClick = commandBar.prop('onClickInspectButton');
+                const wrapper = shallow<DetailsDialog>(<DetailsDialog {...props} />);
 
-                    if (shadowDialog) {
-                        expect(onClick).toBeNull();
-                    } else {
-                        onClick(eventStub);
+                const commandBar = wrapper.find(CommandBar);
+                const onClick = commandBar.prop('onClickInspectButton');
 
-                        clickHandlerMock.verify(
-                            handler => handler(wrapper.instance(), eventStub),
-                            Times.once(),
-                        );
-                    }
-                },
-            );
+                onClick(eventStub);
 
-            test.each(shadowDialogEnabled)(
-                'should should inspect button message, shadow dialog: %s',
-                shadowDialog => {
-                    const handlerMock = Mock.ofInstance<(component: DetailsDialog) => boolean>(
-                        (component: DetailsDialog) => true,
-                    );
+                clickHandlerMock.verify(
+                    handler => handler(wrapper.instance(), eventStub),
+                    Times.once(),
+                );
+            });
 
-                    dialogDetailsHandlerMockObject.shouldShowInspectButtonMessage =
-                        handlerMock.object;
+            test('should should inspect button message', () => {
+                const handlerMock = Mock.ofInstance<(component: DetailsDialog) => boolean>(
+                    (component: DetailsDialog) => true,
+                );
 
-                    const deps = {
-                        ...defaultDetailsDialogDeps,
-                        browserAdapter: {
-                            getUrl: url => 'test-url',
-                        } as any,
-                    };
+                dialogDetailsHandlerMockObject.shouldShowInspectButtonMessage = handlerMock.object;
 
-                    const props = {
-                        ...defaultDetailsDialogProps,
-                        deps,
-                        featureFlagStoreData: {
-                            [FeatureFlags.shadowDialog]: shadowDialog,
-                        },
-                        failedRules: expectedFailedRules,
-                        dialogHandler: dialogDetailsHandlerMockObject,
-                    };
+                const deps = {
+                    ...defaultDetailsDialogDeps,
+                    browserAdapter: {
+                        getUrl: url => 'test-url',
+                    } as any,
+                };
 
-                    const wrapper = shallow<DetailsDialog>(<DetailsDialog {...props} />);
+                const props = {
+                    ...defaultDetailsDialogProps,
+                    deps,
+                    failedRules: expectedFailedRules,
+                    dialogHandler: dialogDetailsHandlerMockObject,
+                };
 
-                    const commandBar = wrapper.find(CommandBar);
+                const wrapper = shallow<DetailsDialog>(<DetailsDialog {...props} />);
 
-                    commandBar.prop('shouldShowInspectButtonMessage')();
+                const commandBar = wrapper.find(CommandBar);
 
-                    handlerMock.verify(handler => handler(wrapper.instance()), Times.once());
-                },
-            );
+                commandBar.prop('shouldShowInspectButtonMessage')();
+
+                handlerMock.verify(handler => handler(wrapper.instance()), Times.once());
+            });
         });
     });
 
@@ -289,6 +245,8 @@ describe('DetailsDialog', () => {
             getFailureInfo: () => 'Failure 1 of 1 for this target',
             componentDidMount: () => {},
             shouldShowInspectButtonMessage: () => false,
+            isTargetPageOriginSecure: () => true,
+            shouldShowInsecureOriginPageMessage: () => false,
         };
     };
 });

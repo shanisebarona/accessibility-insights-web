@@ -2,10 +2,10 @@
 // Licensed under the MIT License.
 import { IssueDetailsTextGenerator } from 'background/issue-details-text-generator';
 import { NavigatorUtils } from 'common/navigator-utils';
+import { ToolData } from 'common/types/store-data/unified-data-interface';
 import { DefaultButton } from 'office-ui-fabric-react';
 import * as React from 'react';
 
-import { ToolData } from 'common/types/store-data/unified-data-interface';
 import { CopyIcon } from '../../common/icons/copy-icon';
 import { CreateIssueDetailsTextData } from '../types/create-issue-details-text-data';
 import { Toast, ToastDeps } from './toast';
@@ -20,6 +20,7 @@ export type CopyIssueDetailsButtonProps = {
     deps: CopyIssueDetailsButtonDeps;
     issueDetailsData: CreateIssueDetailsTextData;
     onClick: (clickEvent: React.MouseEvent<any>) => void;
+    hasSecureTargetPage: boolean;
 };
 
 export class CopyIssueDetailsButton extends React.Component<CopyIssueDetailsButtonProps> {
@@ -37,7 +38,12 @@ export class CopyIssueDetailsButton extends React.Component<CopyIssueDetailsButt
     }
 
     private copyButtonClicked = async (event: React.MouseEvent<any>): Promise<void> => {
-        this.toastRef.current.show('Failure details copied.');
+        const toast = this.toastRef.current;
+        if (toast == null) {
+            // This is very rare (only if the button is clicked mid-initial-render of the Toast)
+            return;
+        }
+
         if (this.props.onClick) {
             this.props.onClick(event);
         }
@@ -46,10 +52,12 @@ export class CopyIssueDetailsButton extends React.Component<CopyIssueDetailsButt
                 this.getIssueDetailsText(this.props.issueDetailsData),
             );
         } catch (error) {
-            this.toastRef.current.show('Failed to copy failure details. Please try again.');
+            if (this.props.hasSecureTargetPage) {
+                toast.show('Failed to copy failure details. Please try again.');
+            }
             return;
         }
-        this.toastRef.current.show('Failure details copied.');
+        toast.show('Failure details copied.');
     };
 
     public render(): JSX.Element {

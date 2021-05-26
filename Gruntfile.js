@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-const androidServiceBin = require('accessibility-insights-for-android-service-bin');
-const merge = require('lodash/merge');
 const path = require('path');
+const androidServiceBin = require('accessibility-insights-for-android-service-bin');
+const yaml = require('js-yaml');
+const merge = require('lodash/merge');
 const sass = require('sass');
 const targets = require('./targets.config');
-const yaml = require('js-yaml');
 
 module.exports = function (grunt) {
     const pkgPath = path.resolve('./node_modules/.bin/pkg');
@@ -256,12 +256,22 @@ module.exports = function (grunt) {
                     publishUrl,
                 },
             },
+            'electron-builder-prepare': {
+                [targetName]: {
+                    dropPath: dropPath,
+                },
+            },
             'electron-builder-pack': {
                 [targetName]: {
                     dropPath: dropPath,
                 },
             },
             'unified-release-drop': {
+                [targetName]: {
+                    // empty on purpose
+                },
+            },
+            'unified-release-pack': {
                 [targetName]: {
                     // empty on purpose
                 },
@@ -395,6 +405,7 @@ module.exports = function (grunt) {
             grunt.log.writeln(`embedding style in ${src}`);
             const fileOptions = { options: { encoding: 'utf8' } };
             const input = grunt.file.read(src, fileOptions);
+            // eslint-disable-next-line no-useless-escape
             const rex = /\<\<CSS:([a-zA-Z\-\.\/]+)\>\>/g;
             const output = input.replace(rex, (_, cssName) => {
                 const cssFile = path.resolve(cssPath, cssName);
@@ -503,7 +514,7 @@ module.exports = function (grunt) {
         // See electron-userland/electron-builder#3547 and AppImage/AppImageKit#678
         config.linux.artifactName = fullName.replace(/ (- )?/g, '_') + '.${ext}';
 
-        for (fileset of [...config.extraResources, ...config.extraFiles]) {
+        for (const fileset of [...config.extraResources, ...config.extraFiles]) {
             fileset.from = fileset.from.replace(/TARGET_SPECIFIC_PRODUCT_DIR/g, productDir);
         }
 
@@ -522,12 +533,12 @@ module.exports = function (grunt) {
             );
         }
 
-        const configFileContent = yaml.safeDump(config);
+        const configFileContent = yaml.dump(config);
         grunt.file.write(outElectronBuilderConfigFile, configFileContent);
         grunt.log.writeln(`generated ${outElectronBuilderConfigFile} from target config`);
     });
 
-    grunt.registerMultiTask('electron-builder-pack', function () {
+    grunt.registerMultiTask('electron-builder-prepare', function () {
         grunt.task.requires('drop:' + this.target);
         grunt.task.requires('configure-electron-builder:' + this.target);
 
@@ -545,6 +556,57 @@ module.exports = function (grunt) {
                     'never',
                     '-c',
                     configFile,
+                    '--dir',
+                ],
+            },
+            (error, result, code) => {
+                if (error) {
+                    grunt.fail.fatal(
+                        `electron-builder exited with error code ${code}:\n\n${result.stdout}`,
+                        code,
+                    );
+                }
+
+                taskDoneCallback();
+            },
+        );
+    });
+
+    grunt.registerMultiTask('electron-builder-pack', function () {
+        const { dropPath } = this.data;
+        const configFile = path.join(dropPath, 'electron-builder.yml');
+
+        mustExist(configFile, 'Have you built the product you are trying to pack?');
+
+        let unpackedDirName;
+
+        switch (process.platform) {
+            case 'win32':
+                unpackedDirName = 'win-unpacked';
+                break;
+            case 'darwin':
+                unpackedDirName = 'mac';
+                break;
+            case 'linux':
+                unpackedDirName = 'linux-unpacked';
+                break;
+        }
+
+        const unpackedPath = path.join(dropPath, 'packed', unpackedDirName);
+
+        const taskDoneCallback = this.async();
+
+        grunt.util.spawn(
+            {
+                cmd: 'node',
+                args: [
+                    'node_modules/electron-builder/out/cli/cli.js',
+                    '-p',
+                    'never',
+                    '-c',
+                    configFile,
+                    '--pd',
+                    unpackedPath,
                 ],
             },
             (error, result, code) => {
@@ -561,8 +623,6 @@ module.exports = function (grunt) {
     });
 
     grunt.registerMultiTask('zip-mac-folder', function () {
-        grunt.task.requires('drop:' + this.target);
-        grunt.task.requires('configure-electron-builder:' + this.target);
         grunt.task.requires('electron-builder-pack:' + this.target);
 
         // We found that the mac update fails unless we produce the
@@ -601,6 +661,10 @@ module.exports = function (grunt) {
     grunt.registerMultiTask('unified-release-drop', function () {
         grunt.task.run(`drop:${this.target}`);
         grunt.task.run(`configure-electron-builder:${this.target}`);
+        grunt.task.run(`electron-builder-prepare:${this.target}`);
+    });
+
+    grunt.registerMultiTask('unified-release-pack', function () {
         grunt.task.run(`electron-builder-pack:${this.target}`);
         grunt.task.run(`zip-mac-folder:${this.target}`);
     });
@@ -635,6 +699,12 @@ module.exports = function (grunt) {
     grunt.registerTask('unified-release-drops', function () {
         unifiedReleaseTargets.forEach(targetName => {
             grunt.task.run('unified-release-drop:' + targetName);
+        });
+    });
+
+    grunt.registerTask('unified-release-packs', function () {
+        unifiedReleaseTargets.forEach(targetName => {
+            grunt.task.run('unified-release-pack:' + targetName);
         });
     });
 
@@ -679,6 +749,7 @@ module.exports = function (grunt) {
         'unified-release-drop:unified-canary',
     ]);
     grunt.registerTask('build-unified-all', ['build-unified', 'unified-release-drops']);
+    grunt.registerTask('pack-unified-all', ['unified-release-packs']);
     grunt.registerTask('build-package-report', [
         'clean:intermediates',
         'exec:generate-scss-typings',

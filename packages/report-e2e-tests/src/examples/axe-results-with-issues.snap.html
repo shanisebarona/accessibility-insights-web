@@ -132,7 +132,7 @@
       .ms-Fabric.is-focusVisible .ms-Nav-group .ms-nav-linkButton:focus::after {
         border: 1px solid var(--neutral-100);
       }
-      @media screen and (-ms-high-contrast: active) {
+      @media screen and (forced-colors: active) {
         .ms-Fabric.is-focusVisible
           .ms-Nav-group
           .ms-nav-linkButton:focus::after {
@@ -932,24 +932,6 @@
         height: 1px;
         overflow: hidden;
       }
-      .toast-container--YaZxW {
-        display: inline-block;
-      }
-      .toast-content--Wt0Lj {
-        background: var(--neutral-70);
-        border-radius: 4px;
-        color: var(--neutral-0);
-        padding-left: 20px;
-        padding-top: 14px;
-        padding-bottom: 14px;
-        padding-right: 20px;
-        width: 316px;
-        margin-left: calc(316px / -2 - 20px);
-        left: 50%;
-        bottom: 20px;
-        z-index: 1000;
-        position: absolute;
-      }
       .how-to-fix-content--2-Pc1 {
         margin-bottom: 16px;
       }
@@ -999,6 +981,24 @@
         + .action-cancel-button-col--2EdOO {
         margin-left: 8px;
       }
+      .toast-container--YaZxW {
+        display: inline-block;
+      }
+      .toast-content--Wt0Lj {
+        background: var(--neutral-70);
+        border-radius: 4px;
+        color: var(--neutral-0);
+        padding-left: 20px;
+        padding-top: 14px;
+        padding-bottom: 14px;
+        padding-right: 20px;
+        width: 316px;
+        margin-left: calc(316px / -2 - 20px);
+        left: 50%;
+        bottom: 20px;
+        z-index: 1000;
+        position: absolute;
+      }
       div.kebab-menu-callout--14fgT {
         box-shadow: 0px 6.4px 14.4px var(--box-shadow-132),
           0px 1.2px 3.6px var(--box-shadow-108);
@@ -1038,7 +1038,7 @@
       button.kebab-menu-button--2aa2O svg {
         stroke: var(--primary-text);
       }
-      @media screen and (-ms-high-contrast: active) {
+      @media screen and (forced-colors: active) {
         button.kebab-menu-button--2aa2O svg {
           fill: inherit !important;
         }
@@ -1730,6 +1730,7 @@
             class="outcome-summary-bar"
             aria-label="26 Failed, 19 Passed, 45 Not applicable"
             role="img"
+            data-automation-id="outcome-summary-bar"
             ><div style="flex-grow: 26"
               ><span class="fail summary-bar-left-edge"
                 ><span aria-hidden="true"
@@ -1834,7 +1835,11 @@
               class="rule-details-group--39A1d"
               data-automation-id="rule-details-group"
               ><div
-                class="collapsible-container collapsible-rule-details-group--3aN3u collapsed"
+                class="
+                  collapsible-container
+                  collapsible-rule-details-group--3aN3u
+                  collapsed
+                "
                 ><div class="title-container" role="heading" aria-level="3"
                   ><button
                     class="collapsible-control"
@@ -1943,7 +1948,9 @@
                                       ><div
                                         ><div>Fix ONE of the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li>No valid skip link found</li
                                           ><li>Page does not have a header</li
                                           ><li
@@ -1964,7 +1971,11 @@
                   ></div
                 ></div
               ><div
-                class="collapsible-container collapsible-rule-details-group--3aN3u collapsed"
+                class="
+                  collapsible-container
+                  collapsible-rule-details-group--3aN3u
+                  collapsed
+                "
                 ><div class="title-container" role="heading" aria-level="3"
                   ><button
                     class="collapsible-control"
@@ -2076,7 +2087,9 @@
                                       ><div
                                         ><div>Fix the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             ><span aria-hidden="true"
                                               ><span
@@ -2084,7 +2097,9 @@
                                                 contrast of 2.52 (foreground
                                                 color: </span
                                               ><span
-                                                class="fix-instruction-color-box--HXJ1A"
+                                                class="
+                                                  fix-instruction-color-box--HXJ1A
+                                                "
                                                 style="
                                                   background-color: #8a94a8;
                                                 "
@@ -2092,7 +2107,9 @@
                                               ><span
                                                 >#8a94a8, background color: </span
                                               ><span
-                                                class="fix-instruction-color-box--HXJ1A"
+                                                class="
+                                                  fix-instruction-color-box--HXJ1A
+                                                "
                                                 style="
                                                   background-color: #e7ecd8;
                                                 "
@@ -2150,7 +2167,9 @@
                                       ><div
                                         ><div>Fix the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             ><span aria-hidden="true"
                                               ><span
@@ -2158,7 +2177,9 @@
                                                 contrast of 2.52 (foreground
                                                 color: </span
                                               ><span
-                                                class="fix-instruction-color-box--HXJ1A"
+                                                class="
+                                                  fix-instruction-color-box--HXJ1A
+                                                "
                                                 style="
                                                   background-color: #8a94a8;
                                                 "
@@ -2166,7 +2187,9 @@
                                               ><span
                                                 >#8a94a8, background color: </span
                                               ><span
-                                                class="fix-instruction-color-box--HXJ1A"
+                                                class="
+                                                  fix-instruction-color-box--HXJ1A
+                                                "
                                                 style="
                                                   background-color: #e7ecd8;
                                                 "
@@ -2224,7 +2247,9 @@
                                       ><div
                                         ><div>Fix the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             ><span aria-hidden="true"
                                               ><span
@@ -2232,7 +2257,9 @@
                                                 contrast of 2.52 (foreground
                                                 color: </span
                                               ><span
-                                                class="fix-instruction-color-box--HXJ1A"
+                                                class="
+                                                  fix-instruction-color-box--HXJ1A
+                                                "
                                                 style="
                                                   background-color: #8a94a8;
                                                 "
@@ -2240,7 +2267,9 @@
                                               ><span
                                                 >#8a94a8, background color: </span
                                               ><span
-                                                class="fix-instruction-color-box--HXJ1A"
+                                                class="
+                                                  fix-instruction-color-box--HXJ1A
+                                                "
                                                 style="
                                                   background-color: #e7ecd8;
                                                 "
@@ -2298,7 +2327,9 @@
                                       ><div
                                         ><div>Fix the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             ><span aria-hidden="true"
                                               ><span
@@ -2306,7 +2337,9 @@
                                                 contrast of 2.52 (foreground
                                                 color: </span
                                               ><span
-                                                class="fix-instruction-color-box--HXJ1A"
+                                                class="
+                                                  fix-instruction-color-box--HXJ1A
+                                                "
                                                 style="
                                                   background-color: #8a94a8;
                                                 "
@@ -2314,7 +2347,9 @@
                                               ><span
                                                 >#8a94a8, background color: </span
                                               ><span
-                                                class="fix-instruction-color-box--HXJ1A"
+                                                class="
+                                                  fix-instruction-color-box--HXJ1A
+                                                "
                                                 style="
                                                   background-color: #e7ecd8;
                                                 "
@@ -2349,7 +2384,11 @@
                   ></div
                 ></div
               ><div
-                class="collapsible-container collapsible-rule-details-group--3aN3u collapsed"
+                class="
+                  collapsible-container
+                  collapsible-rule-details-group--3aN3u
+                  collapsed
+                "
                 ><div class="title-container" role="heading" aria-level="3"
                   ><button
                     class="collapsible-control"
@@ -2457,7 +2496,9 @@
                                       ><div
                                         ><div>Fix the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >The &lt;html&gt; element does not
                                             have a lang attribute</li
@@ -2476,7 +2517,11 @@
                   ></div
                 ></div
               ><div
-                class="collapsible-container collapsible-rule-details-group--3aN3u collapsed"
+                class="
+                  collapsible-container
+                  collapsible-rule-details-group--3aN3u
+                  collapsed
+                "
                 ><div class="title-container" role="heading" aria-level="3"
                   ><button
                     class="collapsible-control"
@@ -2586,7 +2631,9 @@
                                       ><div
                                         ><div>Fix ONE of the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >Element does not have an alt
                                             attribute</li
@@ -2646,7 +2693,9 @@
                                       ><div
                                         ><div>Fix ONE of the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >Element does not have an alt
                                             attribute</li
@@ -2706,7 +2755,9 @@
                                       ><div
                                         ><div>Fix ONE of the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >Element does not have an alt
                                             attribute</li
@@ -2766,7 +2817,9 @@
                                       ><div
                                         ><div>Fix ONE of the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >Element does not have an alt
                                             attribute</li
@@ -2804,7 +2857,11 @@
                   ></div
                 ></div
               ><div
-                class="collapsible-container collapsible-rule-details-group--3aN3u collapsed"
+                class="
+                  collapsible-container
+                  collapsible-rule-details-group--3aN3u
+                  collapsed
+                "
                 ><div class="title-container" role="heading" aria-level="3"
                   ><button
                     class="collapsible-control"
@@ -2919,7 +2976,9 @@
                                       ><div
                                         ><div>Fix ONE of the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >aria-label attribute does not exist
                                             or is empty</li
@@ -2974,7 +3033,9 @@
                                       ><div
                                         ><div>Fix ONE of the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >aria-label attribute does not exist
                                             or is empty</li
@@ -3029,7 +3090,9 @@
                                       ><div
                                         ><div>Fix ONE of the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >aria-label attribute does not exist
                                             or is empty</li
@@ -3084,7 +3147,9 @@
                                       ><div
                                         ><div>Fix ONE of the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >aria-label attribute does not exist
                                             or is empty</li
@@ -3139,7 +3204,9 @@
                                       ><div
                                         ><div>Fix ONE of the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >aria-label attribute does not exist
                                             or is empty</li
@@ -3194,7 +3261,9 @@
                                       ><div
                                         ><div>Fix ONE of the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >aria-label attribute does not exist
                                             or is empty</li
@@ -3249,7 +3318,9 @@
                                       ><div
                                         ><div>Fix ONE of the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >aria-label attribute does not exist
                                             or is empty</li
@@ -3304,7 +3375,9 @@
                                       ><div
                                         ><div>Fix ONE of the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >aria-label attribute does not exist
                                             or is empty</li
@@ -3359,7 +3432,9 @@
                                       ><div
                                         ><div>Fix ONE of the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >aria-label attribute does not exist
                                             or is empty</li
@@ -3414,7 +3489,9 @@
                                       ><div
                                         ><div>Fix ONE of the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >aria-label attribute does not exist
                                             or is empty</li
@@ -3469,7 +3546,9 @@
                                       ><div
                                         ><div>Fix ONE of the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >aria-label attribute does not exist
                                             or is empty</li
@@ -3524,7 +3603,9 @@
                                       ><div
                                         ><div>Fix ONE of the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >aria-label attribute does not exist
                                             or is empty</li
@@ -3579,7 +3660,9 @@
                                       ><div
                                         ><div>Fix ONE of the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >aria-label attribute does not exist
                                             or is empty</li
@@ -3612,7 +3695,11 @@
                   ></div
                 ></div
               ><div
-                class="collapsible-container collapsible-rule-details-group--3aN3u collapsed"
+                class="
+                  collapsible-container
+                  collapsible-rule-details-group--3aN3u
+                  collapsed
+                "
                 ><div class="title-container" role="heading" aria-level="3"
                   ><button
                     class="collapsible-control"
@@ -3720,7 +3807,9 @@
                                       ><div
                                         ><div>Fix the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >Document does not have a main
                                             landmark</li
@@ -3739,7 +3828,11 @@
                   ></div
                 ></div
               ><div
-                class="collapsible-container collapsible-rule-details-group--3aN3u collapsed"
+                class="
+                  collapsible-container
+                  collapsible-rule-details-group--3aN3u
+                  collapsed
+                "
                 ><div class="title-container" role="heading" aria-level="3"
                   ><button
                     class="collapsible-control"
@@ -3846,7 +3939,9 @@
                                       ><div
                                         ><div>Fix the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >Page must have a level-one
                                             heading</li
@@ -3865,7 +3960,11 @@
                   ></div
                 ></div
               ><div
-                class="collapsible-container collapsible-rule-details-group--3aN3u collapsed"
+                class="
+                  collapsible-container
+                  collapsible-rule-details-group--3aN3u
+                  collapsed
+                "
                 ><div class="title-container" role="heading" aria-level="3"
                   ><button
                     class="collapsible-control"
@@ -3972,7 +4071,9 @@
                                       ><div
                                         ><div>Fix the following:</div
                                         ><ul
-                                          class="insights-fix-instruction-list--1vUZj"
+                                          class="
+                                            insights-fix-instruction-list--1vUZj
+                                          "
                                           ><li
                                             >Some page content is not contained
                                             by landmarks</li
@@ -5809,10 +5910,11 @@
       ><div class="report-footer" role="contentinfo"
         >This automated checks result was generated using the Service Name for
         Axe Results With Issues that helps find some of the most common
-        accessibility issues. The scan was performed using axe-core 3.3.2 and
-        Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
-        like Gecko) HeadlessChrome/78.0.3904.108 Safari/537.36. For a complete
-        WCAG 2.1 compliance assessment please visit
+        accessibility issues. The scan was performed in a clean browser
+        environment, using axe-core 3.3.2 and Mozilla/5.0 (Windows NT 10.0;
+        Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)
+        HeadlessChrome/78.0.3904.108 Safari/537.36 with a display resolution of
+        800x600. For a complete WCAG 2.1 compliance assessment please visit
         <a
           target="_blank"
           href="http://aka.ms/AccessibilityInsights"

@@ -1,7 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import './root-container.scss';
-
 import {
     withStoreSubscription,
     WithStoreSubscriptionDeps,
@@ -12,24 +10,27 @@ import { DetailsViewStoreData } from 'common/types/store-data/details-view-store
 import { FeatureFlagStoreData } from 'common/types/store-data/feature-flag-store-data';
 import { UnifiedScanResultStoreData } from 'common/types/store-data/unified-data-interface';
 import { UserConfigurationStoreData } from 'common/types/store-data/user-configuration-store';
+import {
+    NarrowModeDetector,
+    NarrowModeDetectorDeps,
+} from 'DetailsView/components/narrow-mode-detector';
 import { AndroidSetupStoreData } from 'electron/flux/types/android-setup-store-data';
+import { DeviceConnectionStoreData } from 'electron/flux/types/device-connection-store-data';
+import { LeftNavStoreData } from 'electron/flux/types/left-nav-store-data';
 import { ScanStoreData } from 'electron/flux/types/scan-store-data';
+import { TabStopsStoreData } from 'electron/flux/types/tab-stops-store-data';
 import { WindowStateStoreData } from 'electron/flux/types/window-state-store-data';
+import {
+    DeviceConnectViewContainer,
+    DeviceConnectViewContainerDeps,
+} from 'electron/views/device-connect-view/components/device-connect-view-container';
 import {
     ResultsView,
     ResultsViewDeps,
     ResultsViewProps,
 } from 'electron/views/results/results-view';
-import {
-    DeviceConnectViewContainer,
-    DeviceConnectViewContainerDeps,
-} from 'electron/views/device-connect-view/components/device-connect-view-container';
 import * as React from 'react';
-import { LeftNavStoreData } from 'electron/flux/types/left-nav-store-data';
-import {
-    NarrowModeDetector,
-    NarrowModeDetectorDeps,
-} from 'DetailsView/components/narrow-mode-detector';
+import './root-container.scss';
 
 export type RootContainerDeps = WithStoreSubscriptionDeps<RootContainerState> &
     DeviceConnectViewContainerDeps &
@@ -45,12 +46,14 @@ export type RootContainerState = {
     windowStateStoreData: WindowStateStoreData;
     userConfigurationStoreData: UserConfigurationStoreData;
     scanStoreData: ScanStoreData;
+    deviceConnectionStoreData: DeviceConnectionStoreData;
     unifiedScanResultStoreData: UnifiedScanResultStoreData;
     cardSelectionStoreData: CardSelectionStoreData;
     detailsViewStoreData: DetailsViewStoreData;
     featureFlagStoreData: FeatureFlagStoreData;
     androidSetupStoreData: AndroidSetupStoreData;
     leftNavStoreData: LeftNavStoreData;
+    tabStopsStoreData: TabStopsStoreData;
 };
 
 export const RootContainerInternal = NamedFC<RootContainerProps>('RootContainerInternal', props => {
@@ -75,6 +78,5 @@ export const RootContainerInternal = NamedFC<RootContainerProps>('RootContainerI
     return <DeviceConnectViewContainer {...storeState} {...rest} />;
 });
 
-export const RootContainer = withStoreSubscription<RootContainerProps, RootContainerState>(
-    RootContainerInternal,
-);
+export const RootContainer =
+    withStoreSubscription<RootContainerProps, RootContainerState>(RootContainerInternal);

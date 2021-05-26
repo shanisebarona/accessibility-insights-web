@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 const path = require('path');
-const nodeExternals = require('webpack-node-externals');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const TerserWebpackPlugin = require('terser-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const TerserWebpackPlugin = require('terser-webpack-plugin');
+const nodeExternals = require('webpack-node-externals');
 
 const commonPlugins = [
     new ForkTsCheckerWebpackPlugin(),
@@ -85,6 +85,9 @@ const commonConfig = {
         // It is important that src is absolute but node_modules is relative. See #2520
         modules: [path.resolve(__dirname, './src'), 'node_modules'],
         extensions: ['.tsx', '.ts', '.js'],
+        // axe-core invokes require('crypto'), but only in a path we don't use, so we don't need a polyfill
+        // See https://github.com/dequelabs/axe-core/issues/2873
+        fallback: { crypto: false },
     },
     plugins: commonPlugins,
     performance: {

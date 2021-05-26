@@ -7,7 +7,7 @@ import { CombinedReportHtmlGenerator } from "reports/combined-report-html-genera
 import { CombinedReportParameters, CombinedReportResults, ScanSummaryDetails } from "reports/package/accessibilityInsightsReport";
 import { CombinedResultsReport } from "reports/package/combined-results-report";
 import { CombinedResultsToCardsModelConverter } from "reports/package/combined-results-to-cards-model-converter";
-import { IMock, It, Mock } from "typemoq";
+import { IMock, Mock } from "typemoq";
 
 describe('CombinedResultsReport', () => {
     let reportHtmlGeneratorMock: IMock<CombinedReportHtmlGenerator>;
@@ -59,6 +59,7 @@ describe('CombinedResultsReport', () => {
         serviceName: 'service name',
         axeVersion: 'axe version',
         userAgent: 'browser spec',
+        browserResolution: '1920x1080',
         scanDetails: scanDetails,
         results,
     };

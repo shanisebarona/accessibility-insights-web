@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import * as classNames from 'classnames';
+import classNames from 'classnames';
 import { NamedFC } from 'common/react/named-fc';
 import { kebabCase } from 'lodash';
 import * as React from 'react';
@@ -20,6 +20,8 @@ export type OutcomeSummaryBarProps = {
     countSuffix?: string;
     textLabel?: boolean;
 };
+
+export const outcomeSummaryBarAutomationId = 'outcome-summary-bar';
 
 export const OutcomeSummaryBar = NamedFC<OutcomeSummaryBarProps>('OutcomeSummaryBar', props => {
     const outcomeTypesCount = props.allOutcomeTypes.length;
@@ -53,14 +55,18 @@ export const OutcomeSummaryBar = NamedFC<OutcomeSummaryBarProps>('OutcomeSummary
     };
 
     return (
-        <div className="outcome-summary-bar" aria-label={getLabel()} role="img">
+        <div
+            className="outcome-summary-bar"
+            aria-label={getLabel()}
+            role="img"
+            data-automation-id={outcomeSummaryBarAutomationId}
+        >
             {props.allOutcomeTypes.map((outcomeType, index) => {
                 const { iconStyleInverted, countSuffix } = props;
                 const iconMap =
                     iconStyleInverted === true ? outcomeIconMapInverted : outcomeIconMap;
                 const outcomeIcon = iconMap[outcomeType];
                 const count = props.outcomeStats[outcomeType];
-                const outcomePastTense = outcomeTypeSemantics[outcomeType].pastTense;
 
                 return (
                     <div key={outcomeType} style={{ flexGrow: count }}>

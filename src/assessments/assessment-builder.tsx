@@ -17,11 +17,6 @@ import {
     ScanData,
     TestsEnabledState,
 } from 'common/types/store-data/visualization-store-data';
-import {
-    AssessmentInstanceRowData,
-    AssessmentInstanceTable,
-} from 'DetailsView/components/assessment-instance-table';
-import { AssessmentTestView } from 'DetailsView/components/assessment-test-view';
 import { AnalyzerProvider } from 'injected/analyzers/analyzer-provider';
 import { DecoratedAxeNodeResult } from 'injected/scanner-utils';
 import {
@@ -31,7 +26,6 @@ import {
 import { DrawerProvider } from 'injected/visualization/drawer-provider';
 import { cloneDeep } from 'lodash';
 import { IColumn } from 'office-ui-fabric-react';
-import * as React from 'react';
 import { DictionaryStringTo } from 'types/common-types';
 import { Assessment, AssistedAssessment, ManualAssessment } from './types/iassessment';
 import { ReportInstanceField } from './types/report-instance-field';
@@ -67,8 +61,8 @@ export class AssessmentBuilder {
             requirement.getInstanceStatusColumns = AssessmentBuilder.getInstanceStatusColumns;
         }
 
-        if (!requirement.renderInstanceTableHeader) {
-            requirement.renderInstanceTableHeader = AssessmentBuilder.renderInstanceTableHeader;
+        if (!requirement.instanceTableHeaderType) {
+            requirement.instanceTableHeaderType = 'default';
         }
 
         if (!requirement.getDefaultMessage) {
@@ -103,13 +97,6 @@ export class AssessmentBuilder {
                 isResizable: false,
             },
         ];
-    }
-
-    private static renderInstanceTableHeader(
-        table: AssessmentInstanceTable,
-        items: AssessmentInstanceRowData[],
-    ): JSX.Element {
-        return table.renderDefaultInstanceTableHeader(items);
     }
 
     private static enableTest(scanData: ScanData, payload: AssessmentToggleActionPayload): void {
@@ -182,7 +169,7 @@ export class AssessmentBuilder {
             data.assessments[`${key}Assessment`];
 
         const visualizationConfiguration: AssessmentVisualizationConfiguration = {
-            getTestView: props => <AssessmentTestView {...props} />,
+            testViewType: 'Assessment',
             getStoreData: getStoreData,
             enableTest: (data, payload) =>
                 AssessmentBuilder.enableTest(
@@ -277,7 +264,7 @@ export class AssessmentBuilder {
             data.assessments[assessment.storeDataKey];
 
         const visualizationConfiguration: AssessmentVisualizationConfiguration = {
-            getTestView: props => <AssessmentTestView {...props} />,
+            testViewType: 'Assessment',
             getAssessmentData: data => data.assessments[key],
             setAssessmentData: (data, selectorMap, instanceMap) => {
                 const thisAssessment = data.assessments[key];
@@ -297,9 +284,8 @@ export class AssessmentBuilder {
             key: assessment.storeDataKey,
             getAnalyzer: getAnalyzer,
             getIdentifier: getIdentifier,
-            visualizationInstanceProcessor: AssessmentBuilder.getVisualizationInstanceProcessor(
-                requirements,
-            ),
+            visualizationInstanceProcessor:
+                AssessmentBuilder.getVisualizationInstanceProcessor(requirements),
             getDrawer: getDrawer,
             getNotificationMessage: getNotificationMessage,
             getSwitchToTargetTabOnScan: AssessmentBuilder.getSwitchToTargetTabOnScan(requirements),

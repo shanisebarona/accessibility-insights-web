@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+import { toolName } from 'content/strings/application';
 import { shallow } from 'enzyme';
 import * as React from 'react';
 
-import { toolName } from 'content/strings/application';
 import { ExternalLink } from '../../../../../common/components/external-link';
 import {
     LaunchPad,
@@ -38,11 +38,11 @@ describe('LaunchPad', () => {
     ];
 
     test('render LaunchPad', () => {
-        const deps = ({
+        const deps = {
             axeInfo: {
                 version: AXE_CORE_VERSION,
             },
-        } as any) as LaunchPadDeps;
+        } as any as LaunchPadDeps;
 
         const props: LaunchPadProps = {
             deps,

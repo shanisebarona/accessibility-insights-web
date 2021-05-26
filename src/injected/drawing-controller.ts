@@ -1,20 +1,20 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+import { FrameMessenger } from 'injected/frameCommunicators/frame-messenger';
+import {
+    CommandMessage,
+    CommandMessageResponse,
+} from 'injected/frameCommunicators/respondable-command-message-communicator';
 import { forOwn } from 'lodash';
-
 import { HTMLElementUtils } from '../common/html-element-utils';
 import { FeatureFlagStoreData } from '../common/types/store-data/feature-flag-store-data';
 import { VisualizationType } from '../common/types/visualization-type';
 import { DictionaryNumberTo } from '../types/common-types';
-import { ErrorMessageContent } from './frameCommunicators/error-message-content';
-import { FrameCommunicator, MessageRequest } from './frameCommunicators/frame-communicator';
 import {
     AssessmentVisualizationInstance,
     HtmlElementAxeResultsHelper,
     HTMLIFrameResult,
 } from './frameCommunicators/html-element-axe-results-helper';
-import { FrameMessageResponseCallback } from './frameCommunicators/window-message-handler';
-import { RegisterDrawer } from './visualization-type-drawer-registrar';
 import { Drawer } from './visualization/drawer';
 
 export interface VisualizationWindowMessage {
@@ -32,26 +32,26 @@ export class DrawingController {
     private featureFlagStoreData: FeatureFlagStoreData;
 
     constructor(
-        private frameCommunicator: FrameCommunicator,
-        private axeResultsHelper: HtmlElementAxeResultsHelper,
-        private htmlElementUtils: HTMLElementUtils,
+        private readonly frameMessenger: FrameMessenger,
+        private readonly axeResultsHelper: HtmlElementAxeResultsHelper,
+        private readonly htmlElementUtils: HTMLElementUtils,
     ) {}
 
     public initialize(): void {
-        this.frameCommunicator.subscribe(
+        this.frameMessenger.addMessageListener(
             DrawingController.triggerVisualizationCommand,
             this.onTriggerVisualization,
         );
     }
 
-    public registerDrawer: RegisterDrawer = (id: string, drawer: Drawer) => {
+    public registerDrawer = (id: string, drawer: Drawer) => {
         if (this.drawers[id]) {
             throw new Error(`Drawer already registered to id: ${id}`);
         }
         this.drawers[id] = drawer;
     };
 
-    public processRequest = (message: VisualizationWindowMessage): void => {
+    public processRequest = async (message: VisualizationWindowMessage): Promise<void> => {
         this.featureFlagStoreData = message.featureFlagStoreData;
         if (message.isEnabled) {
             const elementResultsByFrames = message.elementResults
@@ -63,14 +63,11 @@ export class DrawingController {
         }
     };
 
-    private onTriggerVisualization = (
-        result: VisualizationWindowMessage,
-        error: ErrorMessageContent,
-        sourceWindow: Window,
-        responder?: FrameMessageResponseCallback,
-    ): void => {
-        this.processRequest(result);
-        this.invokeMethodIfExists(responder, null);
+    private onTriggerVisualization = async (
+        message: CommandMessage,
+    ): Promise<CommandMessageResponse> => {
+        const response = await this.processRequest(message.payload);
+        return { payload: response };
     };
 
     private enableVisualization(
@@ -103,23 +100,23 @@ export class DrawingController {
         }
     }
 
-    private enableVisualizationInCurrentFrame(
+    private enableVisualizationInCurrentFrame = async (
         currentFrameResults: AssessmentVisualizationInstance[],
         configId: string,
-    ): void {
+    ): Promise<void> => {
         const drawer = this.getDrawer(configId);
         drawer.initialize({
             data: this.getInitialElements(currentFrameResults),
             featureFlagStoreData: this.featureFlagStoreData,
         });
-        drawer.drawLayout();
-    }
+        await drawer.drawLayout();
+    };
 
-    private enableVisualizationInIFrames(
+    private enableVisualizationInIFrames = async (
         frame: HTMLIFrameElement,
         frameResults: AssessmentVisualizationInstance[],
         configId: string,
-    ): void {
+    ): Promise<void> => {
         const message: VisualizationWindowMessage = {
             elementResults: frameResults,
             isEnabled: true,
@@ -127,26 +124,25 @@ export class DrawingController {
             configId: configId,
         };
 
-        this.frameCommunicator.sendMessage(this.createFrameRequestMessage(frame, message));
-    }
+        await this.frameMessenger.sendMessageToFrame(
+            frame,
+            this.createFrameRequestMessage(message),
+        );
+    };
 
     private disableVisualization(configId: string): void {
         this.disableVisualizationInCurrentFrame(configId);
         this.disableVisualizationInIFrames(configId);
     }
 
-    private createFrameRequestMessage(
-        frame: HTMLIFrameElement,
-        message: VisualizationWindowMessage,
-    ): MessageRequest<VisualizationWindowMessage> {
+    private createFrameRequestMessage(message: VisualizationWindowMessage): CommandMessage {
         return {
             command: DrawingController.triggerVisualizationCommand,
-            frame: frame,
-            message: message,
-        } as MessageRequest<VisualizationWindowMessage>;
+            payload: message,
+        };
     }
 
-    private disableVisualizationInIFrames(configId: string): void {
+    private disableVisualizationInIFrames = async (configId: string): Promise<void> => {
         const iframes = this.getAllFrames();
 
         for (let i = 0; i < iframes.length; i++) {
@@ -157,10 +153,13 @@ export class DrawingController {
                     configId: configId,
                 };
 
-                this.frameCommunicator.sendMessage(this.createFrameRequestMessage(iframe, message));
+                await this.frameMessenger.sendMessageToFrame(
+                    iframe,
+                    this.createFrameRequestMessage(message),
+                );
             }
         }
-    }
+    };
 
     private disableVisualizationInCurrentFrame(configId: string): void {
         const drawer = this.getDrawer(configId);
@@ -175,12 +174,6 @@ export class DrawingController {
 
     private getDrawer(configId: string): Drawer {
         return this.drawers[configId];
-    }
-
-    private invokeMethodIfExists(method: Function, data: any): void {
-        if (method) {
-            method(data);
-        }
     }
 
     private getInitialElements(

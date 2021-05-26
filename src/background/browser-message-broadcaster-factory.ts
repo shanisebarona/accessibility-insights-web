@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+import { inspect } from 'util';
 import { BrowserAdapter } from 'common/browser-adapters/browser-adapter';
 import { Logger } from 'common/logging/logger';
-import { inspect } from 'util';
 
 export type MessageBroadcaster = (message: any) => Promise<void>;
 
@@ -59,7 +59,7 @@ export class BrowserMessageBroadcasterFactory {
     ) => {
         // We get this message when we have not yet injected our content script on the tab we are
         // sending the message to.
-        // Filtering this out (not log it to the console) to avoid generating meaningless noise
+        // Filtering this out (not logging it to the console) to avoid generating meaningless noise
         if (chromeError.message === connectionErrorMessage) {
             return;
         }

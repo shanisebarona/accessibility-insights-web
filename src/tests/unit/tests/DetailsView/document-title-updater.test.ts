@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+import { title } from 'content/strings/application';
 import { IMock, It, Mock, MockBehavior } from 'typemoq';
 
-import { title } from 'content/strings/application';
 import { VisualizationConfigurationFactory } from '../../../../common/configs/visualization-configuration-factory';
 import { TabStoreData } from '../../../../common/types/store-data/tab-store-data';
 import { VisualizationType } from '../../../../common/types/visualization-type';
@@ -44,7 +44,7 @@ describe('DocumentTitleUpdater', () => {
             MockBehavior.Strict,
         );
         getSwitcherNavConfigMock = Mock.ofInstance(_ => null, MockBehavior.Strict);
-        visualizationConfigFactoryMock = Mock.ofType(VisualizationConfigurationFactory);
+        visualizationConfigFactoryMock = Mock.ofType<VisualizationConfigurationFactory>();
 
         switcherNavConfigStub = {
             getSelectedDetailsView: getSelectedDetailsViewMock.object,

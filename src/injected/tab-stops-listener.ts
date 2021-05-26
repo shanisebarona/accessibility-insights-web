@@ -4,48 +4,37 @@ import { DateProvider } from 'common/date-provider';
 import { HTMLElementUtils } from 'common/html-element-utils';
 import { TabStopEvent } from 'common/types/tab-stop-event';
 import { WindowUtils } from 'common/window-utils';
-import { VisualizationWindowMessage } from './drawing-controller';
-import { ErrorMessageContent } from './frameCommunicators/error-message-content';
-import { FrameCommunicator, MessageRequest } from './frameCommunicators/frame-communicator';
-import { FrameMessageResponseCallback } from './frameCommunicators/window-message-handler';
-import { ScannerUtils } from './scanner-utils';
+import { FrameMessenger } from 'injected/frameCommunicators/frame-messenger';
+import {
+    CommandMessage,
+    CommandMessageResponse,
+} from 'injected/frameCommunicators/respondable-command-message-communicator';
 
 export class TabStopsListener {
-    private frameCommunicator: FrameCommunicator;
-    private htmlElementUtils: HTMLElementUtils;
-    private scannerUtils: ScannerUtils;
-    private windowUtils: WindowUtils;
-    private dom: Document;
     public static readonly startListeningCommand = 'insights.startListenToTabstops';
     public static readonly stopListeningCommand = 'insights.stopListenToTabstops';
     public static readonly getTabbedElementsCommand = 'insights.getTabbedElements';
 
-    private tabEventListener: (tabbedItems: TabStopEvent) => void;
+    private tabEventListener?: (tabbedItems: TabStopEvent) => void;
 
     constructor(
-        frameCommunicator: FrameCommunicator,
-        windowUtils: WindowUtils,
-        htmlElementUtils: HTMLElementUtils,
-        scannerUtils: ScannerUtils,
-        dom?: Document,
-    ) {
-        this.frameCommunicator = frameCommunicator;
-        this.htmlElementUtils = htmlElementUtils;
-        this.windowUtils = windowUtils;
-        this.scannerUtils = scannerUtils;
-        this.dom = dom || document;
-    }
+        private readonly frameMessenger: FrameMessenger,
+        private readonly windowUtils: WindowUtils,
+        private readonly htmlElementUtils: HTMLElementUtils,
+        private readonly getUniqueSelector: (element: HTMLElement) => string,
+        private readonly dom: Document,
+    ) {}
 
     public initialize(): void {
-        this.frameCommunicator.subscribe(
+        this.frameMessenger.addMessageListener(
             TabStopsListener.startListeningCommand,
             this.onStartListenToTabStops,
         );
-        this.frameCommunicator.subscribe(
+        this.frameMessenger.addMessageListener(
             TabStopsListener.getTabbedElementsCommand,
             this.onGetTabbedElements,
         );
-        this.frameCommunicator.subscribe(
+        this.frameMessenger.addMessageListener(
             TabStopsListener.stopListeningCommand,
             this.onStopListenToTabStops,
         );
@@ -59,51 +48,56 @@ export class TabStopsListener {
         }
     }
 
-    public startListenToTabStops(): void {
-        this.onStartListenToTabStops();
-    }
+    public startListenToTabStops = async (): Promise<CommandMessageResponse | null> => {
+        return await this.onStartListenToTabStops();
+    };
 
-    public stopListenToTabStops(): void {
-        this.onStopListenToTabStops();
-    }
+    public stopListenToTabStops = async (): Promise<CommandMessageResponse | null> => {
+        return await this.onStopListenToTabStops();
+    };
 
-    private onGetTabbedElements = (
-        tabStopEvent: TabStopEvent,
-        error: ErrorMessageContent,
+    private onGetTabbedElements = async (
+        commandMessage: CommandMessage,
         messageSourceWin: Window,
-        responder?: FrameMessageResponseCallback,
-    ): void => {
+    ): Promise<CommandMessageResponse | null> => {
+        const tabStopEvent = commandMessage.payload;
         const messageSourceFrame = this.getFrameElementForWindow(messageSourceWin);
 
         if (messageSourceFrame != null) {
-            const frameSelector = this.scannerUtils.getUniqueSelector(messageSourceFrame);
+            const frameSelector = this.getUniqueSelector(messageSourceFrame);
             tabStopEvent.target.splice(0, 0, frameSelector);
 
-            this.sendTabbedElements(tabStopEvent);
+            return await this.sendTabbedElements(tabStopEvent);
         } else {
             throw new Error('unable to get frame element for the tabbed element');
         }
     };
 
-    private sendTabbedElements = (tabStopEvent: TabStopEvent): void => {
+    private sendTabbedElements = async (
+        tabStopEvent: TabStopEvent,
+    ): Promise<CommandMessageResponse | null> => {
         if (this.windowUtils.isTopWindow()) {
             if (this.tabEventListener) {
                 this.tabEventListener(tabStopEvent);
+                return {
+                    payload: tabStopEvent,
+                };
             } else {
                 throw new Error('Tab Listener not setup in main window');
             }
         } else {
-            this.sendTabbedElementsToParent(tabStopEvent);
+            return await this.sendTabbedElementsToParent(tabStopEvent);
         }
     };
 
-    private sendTabbedElementsToParent = (tabStopEvent: TabStopEvent): void => {
-        const messageRequest: MessageRequest<TabStopEvent> = {
-            win: this.windowUtils.getParentWindow(),
+    private sendTabbedElementsToParent = async (
+        tabStopEvent: TabStopEvent,
+    ): Promise<CommandMessageResponse> => {
+        const message: CommandMessage = {
             command: TabStopsListener.getTabbedElementsCommand,
-            message: tabStopEvent,
+            payload: tabStopEvent,
         };
-        this.frameCommunicator.sendMessage(messageRequest);
+        return this.frameMessenger.sendMessageToWindow(this.windowUtils.getParentWindow(), message);
     };
 
     private getFrameElementForWindow(win: Window): HTMLIFrameElement {
@@ -118,36 +112,40 @@ export class TabStopsListener {
         return null;
     }
 
-    private onStartListenToTabStops = (): void => {
+    private onStartListenToTabStops = async (): Promise<CommandMessageResponse | null> => {
         this.addListeners();
         const iframes = this.getAllFrames();
         for (let pos = 0; pos < iframes.length; pos++) {
-            this.startListenToTabStopsInFrame(iframes[pos]);
+            await this.startListenToTabStopsInFrame(iframes[pos]);
         }
+        return { payload: null };
     };
 
-    private onStopListenToTabStops = (): void => {
+    private onStopListenToTabStops = async (): Promise<CommandMessageResponse | null> => {
         this.removeListeners();
         const iframes = this.getAllFrames();
         for (let pos = 0; pos < iframes.length; pos++) {
-            this.stopListenToTabStopsInFrame(iframes[pos]);
+            await this.stopListenToTabStopsInFrame(iframes[pos]);
         }
+        return { payload: null };
     };
 
-    private startListenToTabStopsInFrame(frame: HTMLIFrameElement): void {
-        const message: MessageRequest<VisualizationWindowMessage> = {
+    private startListenToTabStopsInFrame = async (
+        frame: HTMLIFrameElement,
+    ): Promise<CommandMessageResponse> => {
+        const message: CommandMessage = {
             command: TabStopsListener.startListeningCommand,
-            frame: frame,
         };
-        this.frameCommunicator.sendMessage(message);
-    }
+        return await this.frameMessenger.sendMessageToFrame(frame, message);
+    };
 
-    private stopListenToTabStopsInFrame = (frame: HTMLIFrameElement): void => {
-        const message: MessageRequest<VisualizationWindowMessage> = {
+    private stopListenToTabStopsInFrame = async (
+        frame: HTMLIFrameElement,
+    ): Promise<CommandMessageResponse> => {
+        const message: CommandMessage = {
             command: TabStopsListener.stopListeningCommand,
-            frame: frame,
         };
-        this.frameCommunicator.sendMessage(message);
+        return await this.frameMessenger.sendMessageToFrame(frame, message);
     };
 
     private addListeners(): void {
@@ -158,18 +156,19 @@ export class TabStopsListener {
         this.dom.removeEventListener('focusin', this.onFocusIn);
     }
 
-    private onFocusIn = (event: Event): void => {
+    private onFocusIn = async (event: Event): Promise<null> => {
         const target: HTMLElement = event.target as HTMLElement;
 
         const timestamp: Date = DateProvider.getCurrentDate();
 
         const tabStopEvent: TabStopEvent = {
             timestamp: timestamp.getTime(),
-            target: [this.scannerUtils.getUniqueSelector(target)],
+            target: [this.getUniqueSelector(target)],
             html: target.outerHTML,
         };
 
-        this.sendTabbedElements(tabStopEvent);
+        await this.sendTabbedElements(tabStopEvent);
+        return null;
     };
 
     private getAllFrames(): HTMLCollectionOf<HTMLIFrameElement> {

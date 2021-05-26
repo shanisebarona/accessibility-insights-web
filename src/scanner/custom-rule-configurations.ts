@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+import { headersAttributeRuleConfiguration } from 'scanner/custom-rules/headers-attribute-rule';
 import { autocompleteRuleConfiguration } from './custom-rules/autocomplete-rule';
 import { colorConfiguration } from './custom-rules/color-rule';
 import { cssContentConfiguration } from './custom-rules/css-content-rule';
@@ -16,6 +17,7 @@ import { nativeWidgetsDefaultConfiguration } from './custom-rules/native-widgets
 import { pageConfiguration } from './custom-rules/page-title';
 import { textAlternativeConfiguration } from './custom-rules/text-alternative';
 import { textContrastConfiguration } from './custom-rules/text-contrast';
+import { textSpacingConfiguration } from './custom-rules/text-spacing-rule';
 import { uniqueLandmarkConfiguration } from './custom-rules/unique-landmark';
 import { widgetFunctionConfiguration } from './custom-rules/widget-function';
 import { RuleConfiguration } from './iruleresults';
@@ -39,4 +41,6 @@ export const configuration: RuleConfiguration[] = [
     cssContentConfiguration,
     autocompleteRuleConfiguration,
     headerRuleConfiguration,
+    textSpacingConfiguration,
+    headersAttributeRuleConfiguration,
 ];

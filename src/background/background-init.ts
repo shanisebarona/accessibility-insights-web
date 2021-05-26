@@ -2,14 +2,16 @@
 // Licensed under the MIT License.
 import { AppInsights } from 'applicationinsights-js';
 import { Assessments } from 'assessments/assessments';
+import { PostMessageContentHandler } from 'background/post-message-content-handler';
+import { PostMessageContentRepository } from 'background/post-message-content-repository';
 import { ConsoleTelemetryClient } from 'background/telemetry/console-telemetry-client';
 import { DebugToolsTelemetryClient } from 'background/telemetry/debug-tools-telemetry-client';
 import { createToolData } from 'common/application-properties-provider';
 import { BrowserAdapterFactory } from 'common/browser-adapters/browser-adapter-factory';
+import { WebVisualizationConfigurationFactory } from 'common/configs/web-visualization-configuration-factory';
 import { WindowUtils } from 'common/window-utils';
 import * as UAParser from 'ua-parser-js';
 import { AxeInfo } from '../common/axe-info';
-import { VisualizationConfigurationFactory } from '../common/configs/visualization-configuration-factory';
 import { DateProvider } from '../common/date-provider';
 import { getIndexedDBStore } from '../common/indexedDB/get-indexeddb-store';
 import { IndexedDBAPI, IndexedDBUtil } from '../common/indexedDB/indexedDB';
@@ -145,7 +147,7 @@ async function initialize(): Promise<void> {
 
     const tabToContextMap: TabToContextMap = {};
 
-    const visualizationConfigurationFactory = new VisualizationConfigurationFactory();
+    const visualizationConfigurationFactory = new WebVisualizationConfigurationFactory();
     const notificationCreator = new NotificationCreator(
         browserAdapter,
         visualizationConfigurationFactory,
@@ -205,6 +207,17 @@ async function initialize(): Promise<void> {
 
     const devToolsBackgroundListener = new DevToolsListener(tabToContextMap, browserAdapter);
     devToolsBackgroundListener.initialize();
+
+    const postMessageContentRepository = new PostMessageContentRepository(
+        DateProvider.getCurrentDate,
+    );
+
+    const postMessageContentHandler = new PostMessageContentHandler(
+        postMessageContentRepository,
+        browserAdapter,
+    );
+
+    postMessageContentHandler.initialize();
 
     window.insightsFeatureFlags = globalContext.featureFlagsController;
     window.insightsUserConfiguration = globalContext.userConfigurationController;

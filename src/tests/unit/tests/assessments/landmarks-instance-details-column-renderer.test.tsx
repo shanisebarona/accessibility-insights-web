@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import * as React from 'react';
 
 import { landmarksAssessmentInstanceDetailsColumnRenderer } from 'assessments/landmarks/landmarks-instance-details-column-renderer';
+import { InstanceTableRow } from 'assessments/types/instance-table-data';
+import * as React from 'react';
 import { LandmarksAssessmentProperties } from '../../../../common/types/store-data/assessment-result-data';
 import { AssessmentInstanceDetailsColumn } from '../../../../DetailsView/components/assessment-instance-details-column';
-import { AssessmentInstanceRowData } from '../../../../DetailsView/components/assessment-instance-table';
 import { LandmarkFormatter } from '../../../../injected/visualization/landmark-formatter';
 
 describe('LandmarksInstanceDetailsColumnRendererTest', () => {
@@ -17,12 +17,11 @@ describe('LandmarksInstanceDetailsColumnRendererTest', () => {
                     label: 'label',
                 },
             },
-        } as AssessmentInstanceRowData<LandmarksAssessmentProperties>;
+        } as InstanceTableRow<LandmarksAssessmentProperties>;
         const expected = (
             <AssessmentInstanceDetailsColumn
                 background={LandmarkFormatter.getStyleForLandmarkRole('banner').borderColor}
                 textContent={'banner: label'}
-                tooltipId={null}
                 customClassName="radio"
             />
         );
@@ -37,12 +36,11 @@ describe('LandmarksInstanceDetailsColumnRendererTest', () => {
                     label: null,
                 },
             },
-        } as AssessmentInstanceRowData<LandmarksAssessmentProperties>;
+        } as InstanceTableRow<LandmarksAssessmentProperties>;
         const expected = (
             <AssessmentInstanceDetailsColumn
                 background={LandmarkFormatter.getStyleForLandmarkRole('banner').borderColor}
                 textContent={'banner'}
-                tooltipId={null}
                 customClassName="radio"
             />
         );

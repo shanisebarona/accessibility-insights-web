@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import { FeatureFlagStoreData } from '../../common/types/store-data/feature-flag-store-data';
 import { WindowUtils } from '../../common/window-utils';
 import { ClientUtils } from '../client-utils';
 import { DialogRenderer } from '../dialog-renderer';
@@ -12,10 +11,14 @@ import { DrawerInitData } from './drawer';
 import { DrawerUtils } from './drawer-utils';
 import { BoxConfig, DrawerConfiguration, Formatter } from './formatter';
 
+const getTargetElementsFromResult = (result: AxeResultsWithFrameLevel, dom: Document) => {
+    const elements = dom.querySelectorAll(result.target[result.targetIndex]);
+    return Array.from(elements);
+};
+
 export class HighlightBoxDrawer extends BaseDrawer {
     protected elementResults: AxeResultsWithFrameLevel[];
     protected dialogRenderer: DialogRenderer;
-    private featureFlagStoreData: FeatureFlagStoreData;
     private clientUtils: ClientUtils;
 
     public static defaultConfiguration: DrawerConfiguration = {
@@ -38,6 +41,7 @@ export class HighlightBoxDrawer extends BaseDrawer {
         drawerUtils: DrawerUtils,
         clientUtils: ClientUtils,
         formatter: Formatter = null,
+        private readonly getElementsToHighlight: typeof getTargetElementsFromResult = getTargetElementsFromResult,
     ) {
         super(dom, containerClass, windowUtils, shadowUtils, drawerUtils, formatter);
         this.clientUtils = clientUtils;
@@ -48,21 +52,23 @@ export class HighlightBoxDrawer extends BaseDrawer {
 
     public initialize(config: DrawerInitData<HtmlElementAxeResults>): void {
         this.elementResults = config.data;
-        this.featureFlagStoreData = config.featureFlagStoreData;
         this.eraseLayout();
     }
 
-    protected addHighlightsToContainer(): void {
-        const highlightElements = this.getHighlightElements();
+    protected addHighlightsToContainer = async (): Promise<void> => {
+        const highlightElements = await this.getHighlightElements();
 
         if (highlightElements.length > 0) {
             for (let elementPos = 0; elementPos < highlightElements.length; elementPos++) {
                 this.containerElement.appendChild(highlightElements[elementPos]);
             }
         }
-    }
+    };
 
-    protected createHighlightElement(element: Element, data: HtmlElementAxeResults): HTMLElement {
+    protected createHighlightElement = async (
+        element: Element,
+        data: HtmlElementAxeResults,
+    ): Promise<HTMLElement> => {
         const currentDom = this.drawerUtils.getDocumentElement();
         const body = currentDom.body;
         const bodyStyle = this.windowUtils.getComputedStyle(body);
@@ -147,8 +153,8 @@ export class HighlightBoxDrawer extends BaseDrawer {
             failureBox.classList.add('failure-label');
 
             if (drawerConfig.failureBoxConfig.hasDialogView) {
-                failureBox.addEventListener('click', () => {
-                    this.dialogRenderer.render(data as any, this.featureFlagStoreData);
+                failureBox.addEventListener('click', async () => {
+                    await this.dialogRenderer.render(data as any);
                 });
             }
             wrapper.appendChild(failureBox);
@@ -156,7 +162,7 @@ export class HighlightBoxDrawer extends BaseDrawer {
 
         wrapper.title = drawerConfig.toolTip || '';
         return wrapper;
-    }
+    };
 
     private createtBox(
         wrapper: HTMLDivElement,
@@ -179,17 +185,15 @@ export class HighlightBoxDrawer extends BaseDrawer {
         return box;
     }
 
-    private getHighlightElements(): HTMLElement[] {
+    private getHighlightElements = async (): Promise<HTMLElement[]> => {
         const highlightElements: HTMLElement[] = [];
 
         for (let i = 0; i < this.elementResults.length; i++) {
             const elementResult = this.elementResults[i];
-            const elementsFound = this.dom.querySelectorAll(
-                elementResult.target[elementResult.targetIndex],
-            );
+            const elementsFound = this.getElementsToHighlight(elementResult, this.dom);
 
             for (let elementPos = 0; elementPos < elementsFound.length; elementPos++) {
-                const element = this.createHighlightElement(
+                const element = await this.createHighlightElement(
                     elementsFound[elementPos],
                     elementResult,
                 );
@@ -199,5 +203,5 @@ export class HighlightBoxDrawer extends BaseDrawer {
             }
         }
         return highlightElements;
-    }
+    };
 }

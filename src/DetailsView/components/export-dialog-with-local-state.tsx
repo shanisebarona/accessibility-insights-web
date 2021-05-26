@@ -49,11 +49,10 @@ export class ExportDialogWithLocalState extends React.Component<
     };
 
     private generateHtml = () => {
-        const exportData = this.props.htmlGenerator(this.state.exportDescription);
-        this.setState({
-            exportData,
+        this.setState((prevState, prevProps) => ({
+            exportData: prevProps.htmlGenerator(prevState.exportDescription),
             exportDescription: '',
-        });
+        }));
     };
 
     public render(): JSX.Element {
@@ -86,10 +85,10 @@ export class ExportDialogWithLocalState extends React.Component<
     }
 
     private onDialogOpened(): void {
-        this.setState({
-            exportDescription: this.props.getExportDescription(),
+        this.setState((_, props) => ({
+            exportDescription: props.getExportDescription(),
             exportName: this.generateReportName(),
-        });
+        }));
     }
 
     public componentDidUpdate(prev: ExportDialogWithLocalStateProps): void {

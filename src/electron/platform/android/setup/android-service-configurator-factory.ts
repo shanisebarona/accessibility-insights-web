@@ -1,7 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { AdbWrapper, AdbWrapperFactory } from 'electron/platform/android/adb-wrapper';
+import { AdbWrapper } from 'electron/platform/android/adb-wrapper';
+import { AndroidFriendlyDeviceNameProvider } from 'electron/platform/android/android-friendly-device-name-provider';
 import { AndroidServiceApkLocator } from 'electron/platform/android/android-service-apk-locator';
 import {
     AndroidServiceConfigurator,
@@ -10,20 +11,22 @@ import {
 } from 'electron/platform/android/setup/android-service-configurator';
 
 export interface ServiceConfiguratorFactory {
-    getServiceConfigurator(adbLocation: string): Promise<ServiceConfigurator>;
+    getServiceConfigurator(adbWrapper: AdbWrapper): ServiceConfigurator;
 }
 
 export class AndroidServiceConfiguratorFactory implements ServiceConfiguratorFactory {
     constructor(
-        private readonly adbWrapperFactory: AdbWrapperFactory,
         private readonly apkLocator: AndroidServiceApkLocator,
         private readonly portFinder: PortFinder,
+        private readonly friendlyDeviceNameProvider: AndroidFriendlyDeviceNameProvider,
     ) {}
 
-    public getServiceConfigurator = async (adbLocation: string): Promise<ServiceConfigurator> => {
-        const adbWrapper: AdbWrapper = await this.adbWrapperFactory.createValidatedAdbWrapper(
-            adbLocation,
+    public getServiceConfigurator = (adbWrapper: AdbWrapper): ServiceConfigurator => {
+        return new AndroidServiceConfigurator(
+            adbWrapper,
+            this.apkLocator,
+            this.portFinder,
+            this.friendlyDeviceNameProvider,
         );
-        return new AndroidServiceConfigurator(adbWrapper, this.apkLocator, this.portFinder);
     };
 }

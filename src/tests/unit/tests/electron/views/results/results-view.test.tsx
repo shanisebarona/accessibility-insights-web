@@ -24,14 +24,16 @@ import {
 } from 'common/types/store-data/unified-data-interface';
 import { LeftNavActionCreator } from 'electron/flux/action-creator/left-nav-action-creator';
 import { ScanActionCreator } from 'electron/flux/action-creator/scan-action-creator';
+import { DeviceConnectionStatus } from 'electron/flux/types/device-connection-status';
 import { LeftNavStoreData } from 'electron/flux/types/left-nav-store-data';
 import { ScanStatus } from 'electron/flux/types/scan-status';
-import { ContentPagesInfo } from 'electron/types/content-page-info';
+import { TabStopsStoreData } from 'electron/flux/types/tab-stops-store-data';
+import { ContentPageInfo, ContentPagesInfo } from 'electron/types/content-page-info';
 import { LeftNavItemKey } from 'electron/types/left-nav-item-key';
-import { ResultsView, ResultsViewProps } from 'electron/views/results/results-view';
 import { TitleBar } from 'electron/views/results/components/title-bar';
+import { ResultsView, ResultsViewProps } from 'electron/views/results/results-view';
 import { TestView } from 'electron/views/results/test-view';
-import { DeviceDisconnectedPopup } from 'electron/views/device-disconnected-popup/device-disconnected-popup';
+import { ScreenshotView } from 'electron/views/screenshot/screenshot-view';
 import { ScreenshotViewModel } from 'electron/views/screenshot/screenshot-view-model';
 import { screenshotViewModelProvider } from 'electron/views/screenshot/screenshot-view-model-provider';
 import { shallow } from 'enzyme';
@@ -46,9 +48,11 @@ describe('ResultsView', () => {
     let getCardSelectionViewDataMock = Mock.ofInstance(getCardSelectionViewData);
     let getUnifiedRuleResultsMock = Mock.ofInstance(getCardViewData);
     let getDateFromTimestampMock: IMock<(timestamp: string) => Date>;
+    let scanPort: number;
     const resultsFilter: ResultsFilter = _ => true;
 
     beforeEach(() => {
+        scanPort = 11111;
         isResultHighlightUnavailableStub = () => null;
         const cardSelectionStoreData = {} as CardSelectionStoreData;
         const resultsHighlightStatus = {
@@ -90,6 +94,10 @@ describe('ResultsView', () => {
             leftNavVisible: true,
         };
 
+        const tabStopsStoreData: TabStopsStoreData = {
+            focusTracking: true,
+        };
+
         const ruleResultsByStatusStub = {
             fail: [{ id: 'test-fail-id' } as CardRuleResult],
         } as CardRuleResultsByStatus;
@@ -123,8 +131,14 @@ describe('ResultsView', () => {
                 getDateFromTimestamp: getDateFromTimestampMock.object,
             },
             cardSelectionStoreData,
-            androidSetupStoreData: {},
+            androidSetupStoreData: {
+                scanPort: scanPort,
+                selectedDevice: {
+                    id: 'some-id',
+                },
+            },
             scanStoreData: {},
+            deviceConnectionStoreData: { status: DeviceConnectionStatus.Unknown },
             userConfigurationStoreData: {
                 isFirstTime: false,
             },
@@ -133,6 +147,7 @@ describe('ResultsView', () => {
             },
             unifiedScanResultStoreData,
             leftNavStoreData,
+            tabStopsStoreData,
         } as ResultsViewProps;
 
         getCardSelectionViewDataMock
@@ -168,7 +183,8 @@ describe('ResultsView', () => {
                     title: `test-${key}-title`,
                     description: <>test {key} description</>,
                     resultsFilter: resultsFilter,
-                }),
+                    visualHelperSection: ScreenshotView,
+                } as ContentPageInfo),
         );
 
         return contentPagesInfo;
@@ -184,18 +200,20 @@ describe('ResultsView', () => {
     it.each(scanStatuses)('when status scan <%s>', scanStatusName => {
         props.scanStoreData.status = ScanStatus[scanStatusName];
 
+        props.deviceConnectionStoreData.status =
+            props.scanStoreData.status === ScanStatus.Failed
+                ? DeviceConnectionStatus.Disconnected
+                : DeviceConnectionStatus.Connected;
+
         const wrapped = shallow(<ResultsView {...props} />);
 
         expect(wrapped.getElement()).toMatchSnapshot();
-
         getCardSelectionViewDataMock.verifyAll();
         getUnifiedRuleResultsMock.verifyAll();
         screenshotViewModelProviderMock.verifyAll();
     });
 
     it('triggers scan when first mounted', () => {
-        const scanPort = 11111;
-
         const scanActionCreatorMock = Mock.ofType(ScanActionCreator);
         scanActionCreatorMock.setup(creator => creator.scan(scanPort)).verifiable(Times.once());
         props.deps.scanActionCreator = scanActionCreatorMock.object;
@@ -226,24 +244,6 @@ describe('ResultsView', () => {
 
             expect(wrapped.find(TitleBar).props().pageTitle).toEqual(expectedTitle);
             expect(wrapped.find(TestView).getElement()).toMatchSnapshot();
-        });
-    });
-
-    describe('DeviceDisconnectedPopup event handlers', () => {
-        it('onRescanDevice', () => {
-            const scanPort = 11111;
-
-            const scanActionCreatorMock = Mock.ofType(ScanActionCreator);
-            props.deps.scanActionCreator = scanActionCreatorMock.object;
-            props.scanStoreData.status = ScanStatus.Failed;
-            props.androidSetupStoreData.scanPort = scanPort;
-            const wrapped = shallow(<ResultsView {...props} />);
-
-            scanActionCreatorMock.reset(); // this mock is used on componentDidMount, which is not in the scope of this unit test
-
-            wrapped.find(DeviceDisconnectedPopup).prop('onRescanDevice')();
-
-            scanActionCreatorMock.verify(creator => creator.scan(scanPort), Times.once());
         });
     });
 });

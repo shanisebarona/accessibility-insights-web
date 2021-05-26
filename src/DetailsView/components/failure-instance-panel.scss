@@ -21,13 +21,6 @@
     color: $primary-text;
 }
 
-.learn-more {
-    color: $communication-primary;
-    text-decoration: none;
-    display: inline-block;
-    margin-bottom: 24px;
-}
-
 .failure-instance-selector-note {
     color: $secondary-text;
     margin: 8px 0px 8px 0px;
@@ -59,7 +52,7 @@
     font-size: 16px !important;
     line-height: 24px !important;
     color: $neutral-100 !important;
-    @media screen and (-ms-high-contrast: active) {
+    @media screen and (forced-colors: active) {
         color: inherit !important;
     }
 }

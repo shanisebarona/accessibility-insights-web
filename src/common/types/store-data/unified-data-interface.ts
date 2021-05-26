@@ -15,6 +15,7 @@ export interface ApplicationProperties {
     name: string;
     version?: string;
     environmentName?: string;
+    resolution?: string;
 }
 
 export interface OSProperties {
@@ -36,7 +37,7 @@ export interface PlatformData {
 }
 
 export interface TargetAppData {
-    name: string;
+    name?: string;
     url?: string;
 }
 

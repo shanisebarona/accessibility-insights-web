@@ -1,16 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import * as React from 'react';
-
+import { InstanceTableRow } from 'assessments/types/instance-table-data';
 import { NewTabLink } from 'common/components/new-tab-link';
+
 import { ColumnValueBag } from 'common/types/property-bag/column-value-bag';
-import { AssessmentInstanceRowData } from 'DetailsView/components/assessment-instance-table';
+import { PropertyBagColumnRendererConfig } from 'common/types/property-bag/property-bag-column-renderer-config';
+import * as React from 'react';
 import { DictionaryStringTo } from 'types/common-types';
-import { PropertyBagColumnRendererConfig } from '../common/property-bag-column-renderer';
 import { PropertyBagColumnRendererFactory } from '../common/property-bag-column-renderer-factory';
 
 export function customWidgetsColumnRenderer<TPropertyBag extends ColumnValueBag>(
-    item: AssessmentInstanceRowData<any>,
+    item: InstanceTableRow<any>,
     configs: PropertyBagColumnRendererConfig<TPropertyBag>[],
     includeLink: boolean,
 ): JSX.Element {
@@ -43,7 +43,7 @@ function renderDesignPatternWithoutLink(pattern: DesignPattern): JSX.Element {
     return <span className="display-name">{pattern.designPattern}</span>;
 }
 
-export function getFlatDesignPatternStringFromRole(role: string): string {
+export function getFlatDesignPatternStringFromRole(role: string): string | null {
     if (!roleToDesignPatternsMapping[role]) {
         return null;
     }

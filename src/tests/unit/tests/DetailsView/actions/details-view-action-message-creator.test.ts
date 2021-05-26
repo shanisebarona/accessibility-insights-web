@@ -2,21 +2,23 @@
 // Licensed under the MIT License.
 import { HeadingsTestStep } from 'assessments/headings/test-steps/test-steps';
 import {
+    LoadAssessmentPayload,
     OnDetailsViewPivotSelected,
     SetAllUrlsPermissionStatePayload,
 } from 'background/actions/action-payloads';
 import { ActionMessageDispatcher } from 'common/message-creators/types/dispatcher';
+import { AssessmentStoreData } from 'common/types/store-data/assessment-result-data';
+import { VersionedAssessmentData } from 'common/types/versioned-assessment-data';
 import { IMock, It, Mock, Times } from 'typemoq';
-
 import {
     AssessmentTelemetryData,
     BaseTelemetryData,
     COPY_ISSUE_DETAILS,
-    DETAILS_VIEW_OPEN,
     DetailsViewOpenTelemetryData,
     DetailsViewPivotSelectedTelemetryData,
-    EXPORT_RESULTS,
+    DETAILS_VIEW_OPEN,
     ExportResultsTelemetryData,
+    EXPORT_RESULTS,
     FeatureFlagToggleTelemetryData,
     LEFT_NAV_PANEL_EXPANDED,
     RequirementActionTelemetryData,
@@ -51,21 +53,6 @@ describe('DetailsViewActionMessageCreatorTest', () => {
         testSubject = new DetailsViewActionMessageCreator(
             telemetryFactoryMock.object,
             dispatcherMock.object,
-        );
-    });
-
-    test('updateIssuesSelectedTargets', () => {
-        const selectedTargets: string[] = ['#headings-1', '#landmark-1'];
-        const expectedMessage = {
-            messageType: Messages.Visualizations.Issues.UpdateSelectedTargets,
-            payload: selectedTargets,
-        };
-
-        testSubject.updateIssuesSelectedTargets(selectedTargets);
-
-        dispatcherMock.verify(
-            dispatcher => dispatcher.dispatchMessage(It.isValue(expectedMessage)),
-            Times.once(),
         );
     });
 
@@ -163,6 +150,38 @@ describe('DetailsViewActionMessageCreatorTest', () => {
             .returns(() => telemetry);
 
         testSubject.selectRequirement(event, HeadingsTestStep.headingFunction, view);
+
+        dispatcherMock.verify(
+            dispatcher => dispatcher.dispatchMessage(It.isValue(expectedMessage)),
+            Times.once(),
+        );
+    });
+
+    test('selectNextRequirement', () => {
+        const view = VisualizationType.Headings;
+        const selectedRequirement = HeadingsTestStep.headingFunction;
+        const event = eventStubFactory.createKeypressEvent() as any;
+        const telemetry: RequirementSelectTelemetryData = {
+            triggeredBy: 'keypress',
+            selectedTest: VisualizationType[view],
+            selectedRequirement: selectedRequirement,
+            source: testSource,
+        };
+
+        const expectedMessage = {
+            messageType: Messages.Assessment.SelectNextRequirement,
+            payload: {
+                telemetry: telemetry,
+                selectedTestSubview: selectedRequirement,
+                selectedTest: view,
+            },
+        };
+
+        telemetryFactoryMock
+            .setup(tf => tf.forSelectRequirement(event, view, selectedRequirement))
+            .returns(() => telemetry);
+
+        testSubject.selectNextRequirement(event, HeadingsTestStep.headingFunction, view);
 
         dispatcherMock.verify(
             dispatcher => dispatcher.dispatchMessage(It.isValue(expectedMessage)),
@@ -471,6 +490,46 @@ describe('DetailsViewActionMessageCreatorTest', () => {
         );
     });
 
+    test('loadAssessment', () => {
+        const assessmentData: VersionedAssessmentData = {
+            version: 2,
+            assessmentData: {} as AssessmentStoreData,
+        };
+        const tabId = -1;
+        const telemetry: BaseTelemetryData = {
+            triggeredBy: TriggeredByNotApplicable,
+            source: TelemetryEventSource.DetailsView,
+        };
+
+        const expectedMessageToLoadAssessment = {
+            messageType: Messages.Assessment.LoadAssessment,
+            payload: {
+                tabId,
+                versionedAssessmentData: assessmentData,
+                telemetry,
+            } as LoadAssessmentPayload,
+        };
+        const expectedMessageToGoToOverview = {
+            messageType: Messages.Visualizations.DetailsView.SetDetailsViewRightContentPanel,
+            payload: 'Overview',
+        };
+
+        telemetryFactoryMock
+            .setup(tf => tf.fromDetailsViewNoTriggeredBy())
+            .returns(() => telemetry);
+
+        testSubject.loadAssessment(assessmentData, tabId);
+
+        dispatcherMock.verify(
+            dispatcher => dispatcher.dispatchMessage(It.isValue(expectedMessageToLoadAssessment)),
+            Times.once(),
+        );
+        dispatcherMock.verify(
+            dispatcher => dispatcher.dispatchMessage(It.isValue(expectedMessageToGoToOverview)),
+            Times.once(),
+        );
+    });
+
     test('enableVisualHelper', () => {
         const requirement = 'fake-requirement-name';
         const telemetry = {
@@ -544,7 +603,7 @@ describe('DetailsViewActionMessageCreatorTest', () => {
             payload: {
                 test: VisualizationType.HeadingsAssessment,
                 requirement,
-                telemetry: null,
+                telemetry: undefined,
             },
         };
 
@@ -554,7 +613,7 @@ describe('DetailsViewActionMessageCreatorTest', () => {
                     VisualizationType.HeadingsAssessment,
                 ),
             )
-            .returns(() => null);
+            .verifiable(Times.never());
 
         testSubject.enableVisualHelper(
             VisualizationType.HeadingsAssessment,
@@ -563,6 +622,7 @@ describe('DetailsViewActionMessageCreatorTest', () => {
             false,
         );
 
+        telemetryFactoryMock.verifyAll();
         dispatcherMock.verify(
             dispatcher => dispatcher.dispatchMessage(It.isValue(expectedMessage)),
             Times.once(),
@@ -577,7 +637,7 @@ describe('DetailsViewActionMessageCreatorTest', () => {
             payload: {
                 test: VisualizationType.HeadingsAssessment,
                 requirement,
-                telemetry: null,
+                telemetry: undefined,
             },
         };
 
@@ -587,7 +647,7 @@ describe('DetailsViewActionMessageCreatorTest', () => {
                     VisualizationType.HeadingsAssessment,
                 ),
             )
-            .returns(() => null);
+            .verifiable(Times.never());
 
         testSubject.enableVisualHelper(
             VisualizationType.HeadingsAssessment,
@@ -596,6 +656,7 @@ describe('DetailsViewActionMessageCreatorTest', () => {
             false,
         );
 
+        telemetryFactoryMock.verifyAll();
         dispatcherMock.verify(
             dispatcher => dispatcher.dispatchMessage(It.isValue(expectedMessage)),
             Times.once(),
@@ -965,7 +1026,6 @@ describe('DetailsViewActionMessageCreatorTest', () => {
                 test: 1,
                 requirement: 'requirement',
                 isVisualizationEnabled: true,
-                selector: null,
                 telemetry: telemetry,
             },
         };

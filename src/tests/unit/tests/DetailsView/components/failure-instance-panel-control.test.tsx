@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+import { Assessments } from 'assessments/assessments';
 import { shallow } from 'enzyme';
 import { ActionButton } from 'office-ui-fabric-react';
 import { TextField } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { IMock, Mock, Times } from 'typemoq';
 
-import { Assessments } from 'assessments/assessments';
 import { FlaggedComponent } from '../../../../../common/components/flagged-component';
 import { FeatureFlagStoreData } from '../../../../../common/types/store-data/feature-flag-store-data';
 import { VisualizationType } from '../../../../../common/types/visualization-type';
@@ -86,7 +86,8 @@ describe('FailureInstancePanelControlTest', () => {
         const flaggedComponent = wrapper.find(FlaggedComponent);
         const flaggedComponentProps = flaggedComponent.props();
         const failureInstancePanelDetails = flaggedComponentProps.enableJSXElement;
-        const failureInstancePanelDetailsProps = failureInstancePanelDetails.props as FailureInstancePanelDetailsProps;
+        const failureInstancePanelDetailsProps =
+            failureInstancePanelDetails.props as FailureInstancePanelDetailsProps;
         failureInstancePanelDetailsProps.onSelectorChange(eventStub, selector);
 
         expect(wrapper.state().currentInstance.path).toEqual(selector);
@@ -114,7 +115,8 @@ describe('FailureInstancePanelControlTest', () => {
         const flaggedComponent = wrapper.find(FlaggedComponent);
         const flaggedComponentProps = flaggedComponent.props();
         const failureInstancePanelDetails = flaggedComponentProps.enableJSXElement;
-        const failureInstancePanelDetailsProps = failureInstancePanelDetails.props as FailureInstancePanelDetailsProps;
+        const failureInstancePanelDetailsProps =
+            failureInstancePanelDetails.props as FailureInstancePanelDetailsProps;
         failureInstancePanelDetailsProps.onValidateSelector(eventStub);
 
         addPathForValidationMock.verifyAll();

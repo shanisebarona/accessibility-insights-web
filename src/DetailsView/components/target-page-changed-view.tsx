@@ -6,8 +6,8 @@ import * as commonStaticStyles from 'DetailsView/components/static-content-commo
 import * as styles from 'DetailsView/components/target-page-changed-view.scss';
 import * as React from 'react';
 
-import { DisplayableVisualizationTypeData } from '../../common/configs/visualization-configuration-factory';
 import { NamedFC } from '../../common/react/named-fc';
+import { DisplayableVisualizationTypeData } from '../../common/types/displayable-visualization-type-data';
 import { VisualizationType } from '../../common/types/visualization-type';
 
 export interface TargetPageChangedViewProps {
@@ -30,8 +30,8 @@ export const TargetPageChangedView = NamedFC<TargetPageChangedViewProps>(
         );
         const startOverText = (
             <>
-                'The target page has changed. Use the {startOverButton} button to scan the new
-                target page.'
+                The target page has changed. Use the {startOverButton} button to scan the new target
+                page.
             </>
         );
 

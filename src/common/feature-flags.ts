@@ -7,14 +7,12 @@ import { FeatureFlagStoreData } from 'common/types/store-data/feature-flag-store
 export class FeatureFlags {
     public static readonly logTelemetryToConsole = 'logTelemetryToConsole';
     public static readonly showAllAssessments = 'showAllAssessments';
-    public static readonly shadowDialog = 'shadowDialog';
     public static readonly showAllFeatureFlags = 'showAllFeatureFlags';
     public static readonly scoping = 'scoping';
     public static readonly showInstanceVisibility = 'showInstanceVisibility';
     public static readonly manualInstanceDetails = 'manualInstanceDetails';
     public static readonly debugTools = 'debugTools';
     public static readonly exportReportOptions = 'exportReportOptions';
-    public static readonly needsReview = 'needsReview';
     public static readonly saveAndLoadAssessment = 'saveAndLoadAssessment';
 }
 
@@ -29,16 +27,6 @@ export interface FeatureFlagDetail {
 
 export function getAllFeatureFlagDetails(): FeatureFlagDetail[] {
     return [
-        {
-            id: FeatureFlags.shadowDialog,
-            defaultValue: false,
-            displayableName: 'Improved dialog styling',
-            displayableDescription:
-                'Avoids styling problems in failure dialogs by rendering them in shadow DOM. ' +
-                "(You'll need to refresh the target page to see the new dialog styling.)",
-            isPreviewFeature: false,
-            forceDefault: false,
-        },
         {
             id: FeatureFlags.showAllAssessments,
             defaultValue: false,
@@ -107,15 +95,6 @@ export function getAllFeatureFlagDetails(): FeatureFlagDetail[] {
             defaultValue: false,
             displayableName: 'More export options',
             displayableDescription: 'Enables exporting reports to external services',
-            isPreviewFeature: true,
-            forceDefault: false,
-        },
-        {
-            id: FeatureFlags.needsReview,
-            defaultValue: true,
-            displayableName: 'Needs review',
-            displayableDescription:
-                'Enable a new test to show automated check rules that might have an accessibility issue and need to be reviewed.',
             isPreviewFeature: true,
             forceDefault: false,
         },

@@ -8,18 +8,16 @@ import { RuleResult, ScanResults } from 'scanner/iruleresults';
 import { ScanOptions } from 'scanner/scan-options';
 import { DictionaryStringTo } from 'types/common-types';
 
-declare let axe: any;
-
 export type DecoratedAxeNodeResult = {
-    status: boolean;
+    status?: boolean;
     ruleId: string;
-    failureSummary: string;
+    failureSummary?: string;
     selector: string;
-    html: string;
-    help: string;
-    id: string;
+    html?: string;
+    help?: string;
+    id?: string;
     guidanceLinks: GuidanceLink[];
-    helpUrl: string;
+    helpUrl?: string;
 } & CheckData;
 
 export interface HtmlElementAxeResults {
@@ -30,9 +28,9 @@ export interface HtmlElementAxeResults {
 
 export class ScannerUtils {
     public constructor(
-        private scanner: typeof scanRunner,
-        private logger: Logger,
-        private generateUID?: () => string,
+        private readonly scanner: typeof scanRunner,
+        private readonly logger: Logger,
+        private readonly generateUID?: () => string,
     ) {}
 
     public scan(options: ScanOptions, callback: (results: ScanResults) => void): void {
@@ -45,16 +43,6 @@ export class ScannerUtils {
                 this.logger.log(`failed to scan with error - ${err}`);
             },
         );
-    }
-
-    public getUniqueSelector(element: HTMLElement): string {
-        /* axe team's suggestion to how to use getSelector */
-        axe._tree = axe.utils.getFlattenedTree(document.documentElement);
-        axe._selectorData = axe.utils.getSelectorData(axe._tree);
-        const selector = axe.utils.getSelector(element);
-        axe._tree = undefined;
-        axe._selectorData = undefined;
-        return selector;
     }
 
     public getIncompleteInstances = (
@@ -125,12 +113,12 @@ export class ScannerUtils {
     private addResultstoDictionary(
         dictionary: DictionaryStringTo<HtmlElementAxeResults>,
         axeRules: RuleResult[],
-        status: boolean,
+        status: boolean | undefined,
     ): void {
         axeRules.forEach(ruleResult => {
             ruleResult.nodes.forEach(node => {
                 const selectorKey = node.target.join(';');
-                node.instanceId = this.generateUID ? this.generateUID() : null;
+                node.instanceId = this.generateUID ? this.generateUID() : undefined;
 
                 const elementResult = dictionary[selectorKey] || {
                     target: node.target,
@@ -149,7 +137,7 @@ export class ScannerUtils {
                     html: node.html,
                     selector: selectorKey,
                     id: node.instanceId,
-                    guidanceLinks: ruleResult.guidanceLinks,
+                    guidanceLinks: ruleResult.guidanceLinks ?? [],
                     helpUrl: ruleResult.helpUrl,
                 };
             });

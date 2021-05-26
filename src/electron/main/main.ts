@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+import * as path from 'path';
 import { FileSystemConfiguration } from 'common/configuration/file-system-configuration';
 import { UserConfigMessageCreator } from 'common/message-creators/user-config-message-creator';
 import { app, BrowserWindow, dialog, ipcMain, nativeTheme } from 'electron';
@@ -11,7 +12,6 @@ import { IPC_FROMRENDERER_MAIN_WINDOW_INITIALIZED_CHANNEL_NAME } from 'electron/
 import { IpcMessageDispatcher, IpcMessageSink } from 'electron/ipc/ipc-message-dispatcher';
 import { MainWindowRendererMessageHandlers } from 'electron/main/main-window-renderer-message-handlers';
 import { OSType, PlatformInfo } from 'electron/window-management/platform-info';
-import * as path from 'path';
 import { mainWindowConfig } from './main-window-config';
 import { NativeHighContrastModeListener } from './native-high-contrast-mode-listener';
 
@@ -30,6 +30,11 @@ const nativeHighContrastModeListener = new NativeHighContrastModeListener(
 
 log.transports.file.level = 'info';
 autoUpdater.logger = log;
+
+if (platformInfo.isLinux()) {
+    // Avoid a conflict between Parallels VM and Electron. See https://github.com/microsoft/accessibility-insights-web/issues/4140
+    app.disableHardwareAcceleration();
+}
 
 let recurringUpdateCheck;
 const electronAutoUpdateCheck = new AutoUpdaterClient(autoUpdater);
@@ -81,7 +86,7 @@ const createWindow = () => {
     mainWindow.on('closed', () => {
         // Drop all references to the window object, to force garbage collection
         ipcMessageDispatcher.unregisterMessageSink(mainWindowMessageSink);
-        mainWindow = null;
+        mainWindow = null!;
     });
 
     electronAutoUpdateCheck

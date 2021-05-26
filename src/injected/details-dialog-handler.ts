@@ -1,15 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 import * as React from 'react';
-import { FeatureFlags } from '../common/feature-flags';
 import { HTMLElementUtils } from '../common/html-element-utils';
+import { WindowUtils } from '../common/window-utils';
 import { DetailsDialog } from './components/details-dialog';
 
 export class DetailsDialogHandler {
     private onDevToolChangedHandler: () => void;
     private onUserConfigChangedHandler: () => void;
 
-    constructor(private htmlElementUtils: HTMLElementUtils) {}
+    constructor(private htmlElementUtils: HTMLElementUtils, private windowUtils: WindowUtils) {}
 
     public backButtonClickHandler = (dialog: DetailsDialog): void => {
         const currentRuleIndex = dialog.state.currentRuleIndex;
@@ -83,6 +83,26 @@ export class DetailsDialogHandler {
         } for this target`;
     };
 
+    public isTargetPageOriginSecure = (): boolean => {
+        return this.windowUtils.isSecureOrigin();
+    };
+
+    public copyIssueDetailsButtonClickHandler = (
+        dialog: DetailsDialog,
+        event: React.MouseEvent<MouseEvent>,
+    ): void => {
+        dialog.props.deps.targetPageActionMessageCreator.copyIssueDetailsClicked(event);
+        if (!this.isTargetPageOriginSecure()) {
+            dialog.setState({ showInsecureOriginPageMessage: true });
+        } else {
+            dialog.setState({ showInsecureOriginPageMessage: false });
+        }
+    };
+
+    public shouldShowInsecureOriginPageMessage = (dialog: DetailsDialog): boolean => {
+        return dialog.state.showInsecureOriginPageMessage;
+    };
+
     public onLayoutDidMount = (): void => {
         const dialogContainer = this.htmlElementUtils.querySelector(
             '.insights-dialog-main-override',
@@ -119,78 +139,7 @@ export class DetailsDialogHandler {
         };
         dialog.props.userConfigStore.addChangedListener(this.onUserConfigChangedHandler);
         this.onUserConfigChanged(dialog);
-
-        if (dialog.props.featureFlagStoreData[FeatureFlags.shadowDialog]) {
-            this.addListenerForDialogInShadowDom(dialog);
-        }
     };
-
-    private addListenerForDialogInShadowDom(dialog: DetailsDialog): void {
-        const shadowRoot = this.htmlElementUtils.querySelector('#insights-shadow-host').shadowRoot;
-
-        this.addEventListenerToCloseContainer(shadowRoot);
-        this.addEventListenerToBackAndNextButton(shadowRoot, dialog);
-        this.addEventListenerToInspectButton(shadowRoot, dialog);
-    }
-
-    private addEventListenerToCloseContainer(shadowRoot: ShadowRoot): void {
-        const closeButtonListener = () => {
-            this.closeWindow(shadowRoot);
-        };
-        this.addShadowClickEventListener(shadowRoot, '.insights-dialog-close', closeButtonListener);
-
-        const modal = shadowRoot.querySelector('.insights-dialog-main-override-shadow');
-        if (modal != null) {
-            this.htmlElementUtils.getBody().classList.add('insights-modal');
-            modal.addEventListener('click', ev => {
-                if (modal === ev.target) {
-                    this.closeWindow(shadowRoot);
-                }
-            });
-        }
-    }
-
-    private addEventListenerToBackAndNextButton(
-        shadowRoot: ShadowRoot,
-        dialog: DetailsDialog,
-    ): void {
-        const leftButtonListener = () => {
-            if (!dialog.isBackButtonDisabled()) {
-                dialog.onClickBackButton();
-            }
-        };
-
-        const rightButtonListener = () => {
-            if (!dialog.isNextButtonDisabled()) {
-                dialog.onClickNextButton();
-            }
-        };
-
-        this.addShadowClickEventListener(
-            shadowRoot,
-            '.insights-dialog-button-left',
-            leftButtonListener,
-        );
-        this.addShadowClickEventListener(
-            shadowRoot,
-            '.insights-dialog-button-right',
-            rightButtonListener,
-        );
-    }
-
-    private addEventListenerToInspectButton(shadowRoot: ShadowRoot, dialog: DetailsDialog): void {
-        const inspectButtonListener = ev => {
-            if (!dialog.isInspectButtonDisabled()) {
-                dialog.onClickInspectButton(ev);
-                this.closeWindow(shadowRoot);
-            }
-        };
-        this.addShadowClickEventListener(
-            shadowRoot,
-            '.insights-dialog-button-inspect',
-            inspectButtonListener,
-        );
-    }
 
     public componentWillUnmount = (dialog: DetailsDialog): void => {
         dialog.props.devToolStore.removeChangedListener(this.onDevToolChangedHandler);
@@ -199,26 +148,5 @@ export class DetailsDialogHandler {
 
     private hasStore(dialog: DetailsDialog): boolean {
         return dialog.props != null && dialog.props.devToolStore != null;
-    }
-
-    private addShadowClickEventListener(
-        shadowRoot: ShadowRoot,
-        selector: string,
-        listener: (ev?) => void,
-    ): void {
-        const clickable = shadowRoot.querySelector(selector);
-        if (clickable != null) {
-            clickable.addEventListener('click', listener);
-        }
-    }
-
-    private closeWindow(shadowRoot: ShadowRoot): void {
-        const shadowContainer = shadowRoot.querySelector('#insights-shadow-container');
-        const dialogContainer = shadowContainer.querySelector('.insights-shadow-dialog-container');
-        if (dialogContainer) {
-            dialogContainer.parentNode.removeChild(dialogContainer);
-        }
-        const body = this.htmlElementUtils.getBody();
-        body.classList.remove(...['insights-modal']);
     }
 }

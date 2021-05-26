@@ -9,14 +9,13 @@ import * as styles from './device-disconnected-popup.scss';
 import { StatusCautionIcon } from './status-caution-icon';
 
 export type DeviceDisconnectedPopupProps = {
-    onConnectNewDevice: () => void;
-    onRescanDevice: () => void;
+    onRedetectDevice: () => void;
     deviceName: string;
 };
 
 export const DeviceDisconnectedPopup = NamedFC<DeviceDisconnectedPopupProps>(
     'DeviceDisconnectedPopup',
-    ({ deviceName, onConnectNewDevice, onRescanDevice }) => {
+    ({ deviceName, onRedetectDevice }) => {
         const title: JSX.Element = (
             <div className={styles.titleContainer}>
                 <StatusCautionIcon />
@@ -40,17 +39,14 @@ export const DeviceDisconnectedPopup = NamedFC<DeviceDisconnectedPopupProps>(
             >
                 <div>
                     <p>
-                        Uh-oh! It seems the <strong>{deviceName}</strong> device has disconnected
-                        before the snapshot completed its analysis.
+                        Uh-oh! It seems the device <strong>{deviceName}</strong> has disconnected.
                     </p>
                     <p>
-                        Make sure your device is properly connected, and try rescanning or
-                        connecting a different device.
+                        Select <strong>Re-detect device</strong> to continue.
                     </p>
                 </div>
                 <DialogFooter>
-                    <DefaultButton text="Connect a new device" onClick={onConnectNewDevice} />
-                    <DefaultButton text="Rescan device" onClick={onRescanDevice} />
+                    <DefaultButton text="Re-detect device" onClick={onRedetectDevice} />
                 </DialogFooter>
             </Dialog>
         );

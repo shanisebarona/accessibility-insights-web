@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import * as React from 'react';
 
 import { frameTitleInstanceDetailsColumnRenderer } from 'assessments/page/frametitle-instance-details-column-renderer';
+import { InstanceTableRow } from 'assessments/types/instance-table-data';
+import * as React from 'react';
 import { FrameAssessmentProperties } from '../../../../common/types/store-data/assessment-result-data';
 import { AssessmentInstanceDetailsColumn } from '../../../../DetailsView/components/assessment-instance-details-column';
-import { AssessmentInstanceRowData } from '../../../../DetailsView/components/assessment-instance-table';
 import { FrameFormatter } from '../../../../injected/visualization/frame-formatter';
 
 describe('FrameTitleInstanceDetailsColumnRendererTest', () => {
@@ -15,13 +15,12 @@ describe('FrameTitleInstanceDetailsColumnRendererTest', () => {
             instance: {
                 propertyBag: null,
             },
-        } as AssessmentInstanceRowData<FrameAssessmentProperties>;
+        } as InstanceTableRow<FrameAssessmentProperties>;
         const expected = (
             <AssessmentInstanceDetailsColumn
                 background={FrameFormatter.frameStyles[frameType].borderColor}
                 labelText={FrameFormatter.frameStyles[frameType].contentText}
                 textContent={null}
-                tooltipId={null}
             />
         );
         expect(expected).toEqual(frameTitleInstanceDetailsColumnRenderer(item));
@@ -37,13 +36,12 @@ describe('FrameTitleInstanceDetailsColumnRendererTest', () => {
                     frameTitle: frameTitle,
                 },
             },
-        } as AssessmentInstanceRowData<FrameAssessmentProperties>;
+        } as InstanceTableRow<FrameAssessmentProperties>;
         const expected = (
             <AssessmentInstanceDetailsColumn
                 background={FrameFormatter.frameStyles[frameType].borderColor}
                 labelText={FrameFormatter.frameStyles[frameType].contentText}
                 textContent={frameTitle}
-                tooltipId={null}
             />
         );
         expect(expected).toEqual(frameTitleInstanceDetailsColumnRenderer(item));
@@ -59,13 +57,12 @@ describe('FrameTitleInstanceDetailsColumnRendererTest', () => {
                     frameTitle: frameTitle,
                 },
             },
-        } as AssessmentInstanceRowData<FrameAssessmentProperties>;
+        } as InstanceTableRow<FrameAssessmentProperties>;
         const expected = (
             <AssessmentInstanceDetailsColumn
                 background={FrameFormatter.frameStyles[frameType].borderColor}
                 labelText={FrameFormatter.frameStyles[frameType].contentText}
                 textContent={frameTitle}
-                tooltipId={null}
             />
         );
         expect(expected).toEqual(frameTitleInstanceDetailsColumnRenderer(item));

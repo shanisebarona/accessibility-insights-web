@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+import Ajv from 'ajv';
 import { AssessmentDefaultMessageGenerator } from 'assessments/assessment-default-message-generator';
 import { Assessments } from 'assessments/assessments';
 import { assessmentsProviderWithFeaturesEnabled } from 'assessments/assessments-feature-flag-filter';
@@ -8,24 +9,32 @@ import { UserConfigurationActions } from 'background/actions/user-configuration-
 import { IssueDetailsTextGenerator } from 'background/issue-details-text-generator';
 import { UserConfigurationStore } from 'background/stores/global/user-configuration-store';
 import { createToolData } from 'common/application-properties-provider';
+import { AssessmentDataFormatter } from 'common/assessment-data-formatter';
+import { AssessmentDataParser } from 'common/assessment-data-parser';
 import { BrowserAdapterFactory } from 'common/browser-adapters/browser-adapter-factory';
 import { ExpandCollapseVisualHelperModifierButtons } from 'common/components/cards/cards-visualization-modifier-buttons';
 import { ThemeInnerState } from 'common/components/theme';
+import { WebVisualizationConfigurationFactory } from 'common/configs/web-visualization-configuration-factory';
+import { FileNameBuilder } from 'common/filename-builder';
 import { getCardSelectionViewData } from 'common/get-card-selection-view-data';
 import { Globalization } from 'common/globalization';
 import { isResultHighlightUnavailableWeb } from 'common/is-result-highlight-unavailable';
 import { createDefaultLogger } from 'common/logging/default-logger';
+import { Logger } from 'common/logging/logger';
 import { CardSelectionMessageCreator } from 'common/message-creators/card-selection-message-creator';
 import { CardSelectionStoreData } from 'common/types/store-data/card-selection-store-data';
+import { FeatureFlagStoreData } from 'common/types/store-data/feature-flag-store-data';
 import { toolName } from 'content/strings/application';
 import { textContent } from 'content/strings/text-content';
 import { AssessmentViewUpdateHandler } from 'DetailsView/components/assessment-view-update-handler';
 import { NavLinkRenderer } from 'DetailsView/components/left-nav/nav-link-renderer';
-import { getNarrowModeThresholdsForWeb } from 'electron/common/narrow-mode-thresholds';
+import { LoadAssessmentDataValidator } from 'DetailsView/components/load-assessment-data-validator';
+import { LoadAssessmentHelper } from 'DetailsView/components/load-assessment-helper';
 import { NoContentAvailableViewDeps } from 'DetailsView/components/no-content-available/no-content-available-view';
 import { AllUrlsPermissionHandler } from 'DetailsView/handlers/allurls-permission-handler';
 import { NoContentAvailableViewRenderer } from 'DetailsView/no-content-available-view-renderer';
 import { NullStoreActionMessageCreator } from 'electron/adapters/null-store-action-message-creator';
+import { getNarrowModeThresholdsForWeb } from 'electron/common/narrow-mode-thresholds';
 import { loadTheme, setFocusVisibility } from 'office-ui-fabric-react';
 import * as ReactDOM from 'react-dom';
 import { ReportExportServiceProviderImpl } from 'report-export/report-export-service-provider-impl';
@@ -56,7 +65,6 @@ import { CardsCollapsibleControl } from '../common/components/cards/collapsible-
 import { FixInstructionProcessor } from '../common/components/fix-instruction-processor';
 import { NewTabLink } from '../common/components/new-tab-link';
 import { getPropertyConfiguration } from '../common/configs/unified-result-property-configurations';
-import { VisualizationConfigurationFactory } from '../common/configs/visualization-configuration-factory';
 import { DateProvider } from '../common/date-provider';
 import { DocumentManipulator } from '../common/document-manipulator';
 import { DropdownClickHandler } from '../common/dropdown-click-handler';
@@ -64,9 +72,6 @@ import { TelemetryEventSource } from '../common/extension-telemetry-events';
 import { initializeFabricIcons } from '../common/fabric-icons';
 import { getAllFeatureFlagDetails } from '../common/feature-flags';
 import { FileURLProvider } from '../common/file-url-provider';
-import { AssessmentDataFormatter } from 'common/assessment-data-formatter';
-import { AssessmentDataParser } from 'common/assessment-data-parser';
-import { FileNameBuilder } from 'common/filename-builder';
 import { GetGuidanceTagsFromGuidanceLinks } from '../common/get-guidance-tags-from-guidance-links';
 import { getInnerTextFromJsxElement } from '../common/get-inner-text-from-jsx-element';
 import { HTMLElementUtils } from '../common/html-element-utils';
@@ -109,7 +114,6 @@ import { DictionaryStringTo } from '../types/common-types';
 import { IssueFilingServiceProviderImpl } from './../issue-filing/issue-filing-service-provider-impl';
 import { UnifiedResultToIssueFilingDataConverter } from './../issue-filing/unified-result-to-issue-filing-data';
 import { DetailsViewActionMessageCreator } from './actions/details-view-action-message-creator';
-import { IssuesSelectionFactory } from './actions/issues-selection-factory';
 import { AssessmentTableColumnConfigHandler } from './components/assessment-table-column-config-handler';
 import { ExtensionSettingsProvider } from './components/details-view-overlay/settings-panel/settings/extension-settings-provider';
 import { GetDetailsRightPanelConfiguration } from './components/details-view-right-panel';
@@ -125,7 +129,6 @@ import { AssessmentInstanceTableHandler } from './handlers/assessment-instance-t
 import { DetailsViewToggleClickHandlerFactory } from './handlers/details-view-toggle-click-handler-factory';
 import { MasterCheckBoxConfigProvider } from './handlers/master-checkbox-config-provider';
 import { PreviewFeatureFlagsHandler } from './handlers/preview-feature-flags-handler';
-import { Logger } from 'common/logging/logger';
 
 declare const window: AutoChecker & Window;
 
@@ -273,14 +276,11 @@ if (tabId != null) {
                 actionMessageDispatcher,
             );
 
-            const issuesSelection = new IssuesSelectionFactory().createSelection(
-                detailsViewActionMessageCreator,
-            );
             const clickHandlerFactory = new DetailsViewToggleClickHandlerFactory(
                 visualizationActionCreator,
                 telemetryFactory,
             );
-            const visualizationConfigurationFactory = new VisualizationConfigurationFactory();
+            const visualizationConfigurationFactory = new WebVisualizationConfigurationFactory();
             const assessmentDefaultMessageGenerator = new AssessmentDefaultMessageGenerator();
             const assessmentInstanceTableHandler = new AssessmentInstanceTableHandler(
                 detailsViewActionMessageCreator,
@@ -392,19 +392,38 @@ if (tabId != null) {
 
             const assessmentDataParser = new AssessmentDataParser();
 
+            const fileReader = new FileReader();
+
             const fileNameBuilder = new FileNameBuilder();
 
             const axeResultToIssueFilingDataConverter = new AxeResultToIssueFilingDataConverter(
                 IssueFilingUrlStringUtils.getSelectorLastPart,
             );
 
-            const unifiedResultToIssueFilingDataConverter = new UnifiedResultToIssueFilingDataConverter();
+            const unifiedResultToIssueFilingDataConverter =
+                new UnifiedResultToIssueFilingDataConverter();
 
             const documentManipulator = new DocumentManipulator(document);
 
             const assessmentViewUpdateHandler = new AssessmentViewUpdateHandler();
 
             const navLinkRenderer = new NavLinkRenderer();
+
+            const ajv = new Ajv();
+
+            const loadAssessmentDataValidator = new LoadAssessmentDataValidator(
+                ajv,
+                Assessments,
+                featureFlagStore.getState() as FeatureFlagStoreData,
+            );
+
+            const loadAssessmentHelper = new LoadAssessmentHelper(
+                assessmentDataParser,
+                detailsViewActionMessageCreator,
+                fileReader,
+                document,
+                loadAssessmentDataValidator,
+            );
 
             const deps: DetailsViewContainerDeps = {
                 textContent,
@@ -425,8 +444,11 @@ if (tabId != null) {
                 assessmentDataFormatter,
                 assessmentDataParser,
                 fileNameBuilder,
-                getAssessmentSummaryModelFromProviderAndStoreData: getAssessmentSummaryModelFromProviderAndStoreData,
-                getAssessmentSummaryModelFromProviderAndStatusData: getAssessmentSummaryModelFromProviderAndStatusData,
+                loadAssessmentHelper,
+                getAssessmentSummaryModelFromProviderAndStoreData:
+                    getAssessmentSummaryModelFromProviderAndStoreData,
+                getAssessmentSummaryModelFromProviderAndStatusData:
+                    getAssessmentSummaryModelFromProviderAndStatusData,
                 visualizationConfigurationFactory,
                 getDetailsRightPanelConfiguration: GetDetailsRightPanelConfiguration,
                 navLinkHandler: new NavLinkHandler(detailsViewActionMessageCreator),
@@ -470,7 +492,6 @@ if (tabId != null) {
                 customCongratsContinueInvestigatingMessage: null, // uses default message
                 scopingActionMessageCreator,
                 inspectActionMessageCreator,
-                issuesSelection,
                 clickHandlerFactory,
                 issuesTableHandler,
                 assessmentInstanceTableHandler,

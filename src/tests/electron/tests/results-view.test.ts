@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import { getNarrowModeThresholdsForUnified } from 'electron/common/narrow-mode-thresholds';
-import { androidTestConfigs } from 'electron/platform/android/test-configs/android-test-configs';
 import * as fs from 'fs';
 import * as path from 'path';
+import { getNarrowModeThresholdsForUnified } from 'electron/common/narrow-mode-thresholds';
+import { androidTestConfigs } from 'electron/platform/android/test-configs/android-test-configs';
 import { createApplication } from 'tests/electron/common/create-application';
 import { ResultsViewSelectors } from 'tests/electron/common/element-identifiers/results-view-selectors';
 import { ScreenshotViewSelectors } from 'tests/electron/common/element-identifiers/screenshot-view-selectors';
@@ -47,7 +47,10 @@ describe('ResultsView', () => {
 
     it('left nav allows to change between tests', async () => {
         const testIndex = 1;
-        const expectedTestTitle = androidTestConfigs[testIndex].contentPageInfo.title;
+        const expectedTestTitle = androidTestConfigs.filter(
+            config => config.featureFlag === undefined,
+        )[testIndex].contentPageInfo.title;
+
         await app.client.browserWindow.setSize(
             narrowModeThresholds.collapseCommandBarThreshold + 1,
             height,

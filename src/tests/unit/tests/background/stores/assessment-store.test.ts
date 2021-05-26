@@ -11,6 +11,7 @@ import {
     ChangeRequirementStatusPayload,
     EditFailureInstancePayload,
     ExpandTestNavPayload,
+    LoadAssessmentPayload,
     RemoveFailureInstancePayload,
     SelectTestSubviewPayload,
     ToggleActionPayload,
@@ -99,7 +100,8 @@ describe('AssessmentStore', () => {
             .returns(step => getDefaultManualTestStepResult(step));
 
         indexDBInstanceMock = Mock.ofType<IndexedDBAPI>(undefined, MockBehavior.Strict);
-        initialAssessmentStoreDataGeneratorMock = Mock.ofType<InitialAssessmentStoreDataGenerator>();
+        initialAssessmentStoreDataGeneratorMock =
+            Mock.ofType<InitialAssessmentStoreDataGenerator>();
     });
 
     afterEach(() => {
@@ -471,6 +473,52 @@ describe('AssessmentStore', () => {
 
         createStoreTesterForAssessmentActions('continuePreviousAssessment')
             .withActionParam(tabId)
+            .testListenerToBeCalledOnce(initialState, finalState);
+    });
+
+    test('onLoadAssessment', () => {
+        const oldTabId = 1;
+        const tabId = 1000;
+        const url = 'url';
+        const title = 'title';
+
+        const tab: Tab = {
+            id: tabId,
+            url,
+            title,
+        };
+
+        const initialState = new AssessmentsStoreDataBuilder(
+            assessmentsProvider,
+            assessmentDataConverterMock.object,
+        )
+            .withTargetTab(oldTabId, null, null, true)
+            .build();
+
+        const payload: LoadAssessmentPayload = {
+            tabId,
+            versionedAssessmentData: {
+                version: -1,
+                assessmentData: initialState,
+            },
+        };
+
+        const finalState = new AssessmentsStoreDataBuilder(
+            assessmentsProvider,
+            assessmentDataConverterMock.object,
+        )
+            .withTargetTab(tabId, url, title, false)
+            .build();
+
+        setupDataGeneratorMock(payload.versionedAssessmentData.assessmentData, initialState);
+
+        assessmentsProviderMock.setup(apm => apm.all()).returns(() => assessmentsProvider.all());
+        browserMock
+            .setup(adapter => adapter.getTab(tabId, It.is(isFunction), It.is(isFunction)))
+            .callback((id, resolve) => resolve(tab));
+
+        createStoreTesterForAssessmentActions('LoadAssessment')
+            .withActionParam(payload)
             .testListenerToBeCalledOnce(initialState, finalState);
     });
 
@@ -1184,16 +1232,17 @@ describe('AssessmentStore', () => {
         'on changeAssessmentVisualizationState: supportsVisualization:$supportsVisualization, ' +
             'startsEnabled:$startsEnabled, payloadEnabled:$payloadEnabled -> finalEnabled:$expectedFinalEnabled',
         ({ supportsVisualization, startsEnabled, payloadEnabled, expectedFinalEnabled }) => {
-            const generatedAssessmentInstancesMap: DictionaryStringTo<GeneratedAssessmentInstance> = {
-                selector: {
-                    testStepResults: {
-                        [requirementKey]: {
-                            isVisualizationEnabled: startsEnabled,
-                            isVisualizationSupported: supportsVisualization,
+            const generatedAssessmentInstancesMap: DictionaryStringTo<GeneratedAssessmentInstance> =
+                {
+                    selector: {
+                        testStepResults: {
+                            [requirementKey]: {
+                                isVisualizationEnabled: startsEnabled,
+                                isVisualizationSupported: supportsVisualization,
+                            },
                         },
-                    },
-                } as any,
-            };
+                    } as any,
+                };
 
             const assessmentData = new AssessmentDataBuilder()
                 .with('generatedAssessmentInstancesMap', generatedAssessmentInstancesMap)
@@ -1217,9 +1266,8 @@ describe('AssessmentStore', () => {
                 .returns(() => configStub);
 
             const expectedInstancesMap = cloneDeep(generatedAssessmentInstancesMap);
-            expectedInstancesMap.selector.testStepResults[
-                requirementKey
-            ].isVisualizationEnabled = expectedFinalEnabled;
+            expectedInstancesMap.selector.testStepResults[requirementKey].isVisualizationEnabled =
+                expectedFinalEnabled;
 
             const expectedAssessment = new AssessmentDataBuilder()
                 .with('generatedAssessmentInstancesMap', expectedInstancesMap)
@@ -1289,9 +1337,8 @@ describe('AssessmentStore', () => {
         // Selector 2 shouldn't change because it doesn't support visualizations
         // Selector 3 shouldn't change because it has no test step results
         // Selector 4 should toggle from disabled to enabled:
-        expectedInstancesMap.selector4.testStepResults[
-            requirementKey
-        ].isVisualizationEnabled = true;
+        expectedInstancesMap.selector4.testStepResults[requirementKey].isVisualizationEnabled =
+            true;
 
         const expectedAssessment = new AssessmentDataBuilder()
             .with('generatedAssessmentInstancesMap', expectedInstancesMap)
@@ -1896,7 +1943,7 @@ describe('AssessmentStore', () => {
     ): void {
         initialAssessmentStoreDataGeneratorMock
             .setup(im => im.generateInitialState(persistedData))
-            .returns(() => initialData as AssessmentStoreData)
+            .returns(() => initialData)
             .verifiable(Times.once());
     }
 

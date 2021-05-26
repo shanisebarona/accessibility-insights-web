@@ -10,10 +10,6 @@ import {
 } from 'common/types/store-data/assessment-result-data';
 import { FeatureFlagStoreData } from 'common/types/store-data/feature-flag-store-data';
 import { DetailsViewActionMessageCreator } from 'DetailsView/actions/details-view-action-message-creator';
-import {
-    AssessmentInstanceRowData,
-    AssessmentInstanceTable,
-} from 'DetailsView/components/assessment-instance-table';
 import { Analyzer } from 'injected/analyzers/analyzer';
 import { AnalyzerProvider } from 'injected/analyzers/analyzer-provider';
 import { DecoratedAxeNodeResult } from 'injected/scanner-utils';
@@ -24,7 +20,7 @@ import { IColumn } from 'office-ui-fabric-react';
 import { DictionaryStringTo } from 'types/common-types';
 import { ContentPageComponent } from 'views/content/content-page';
 import { IGetMessageGenerator } from '../assessment-default-message-generator';
-import { InstanceTableColumn } from './instance-table-column';
+import { InstanceTableColumn, InstanceTableHeaderType } from './instance-table-data';
 import { ReportInstanceFields } from './report-instance-field';
 
 export interface Requirement {
@@ -44,7 +40,7 @@ export interface Requirement {
     columnsConfig?: InstanceTableColumn[];
     getAnalyzer?: (provider: AnalyzerProvider) => Analyzer;
     getVisualHelperToggle?: (props: VisualHelperToggleConfig) => JSX.Element;
-    // Any results this returns false for will be omitted from visual helper displays, but still
+    // Any results for which this returns false will be omitted from visual helper displays, but still
     // present for the purposes of instance lists or getInitialManualTestStatus. By default, all
     // results support visualization.
     isVisualizationSupportedForResult?: (result: DecoratedAxeNodeResult) => boolean;
@@ -59,10 +55,7 @@ export interface Requirement {
     getInstanceStatus?: (result: DecoratedAxeNodeResult) => ManualTestStatus;
     getInstanceStatusColumns?: () => Readonly<IColumn>[];
     getDefaultMessage?: IGetMessageGenerator;
-    renderInstanceTableHeader?: (
-        table: AssessmentInstanceTable,
-        items: AssessmentInstanceRowData[],
-    ) => JSX.Element;
+    instanceTableHeaderType?: InstanceTableHeaderType;
 }
 
 export type VisualHelperToggleConfigDeps = {

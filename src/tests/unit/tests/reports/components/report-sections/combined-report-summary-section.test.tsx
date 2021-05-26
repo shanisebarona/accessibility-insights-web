@@ -1,11 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import {
-    CardResult,
-    CardRuleResult,
-    CardRuleResultsByStatus,
-} from 'common/types/store-data/card-view-model';
+import { CardResult, CardRuleResultsByStatus } from 'common/types/store-data/card-view-model';
 import { shallow } from 'enzyme';
 import * as React from 'react';
 import { CombinedReportSectionProps } from 'reports/components/report-sections/combined-report-section-factory';
@@ -23,7 +19,7 @@ describe(CombinedReportSummarySection, () => {
             {
                 id: 'some-rule',
                 nodes: [
-                    ({
+                    {
                         identifiers: {
                             urls: {
                                 urls: [
@@ -33,14 +29,14 @@ describe(CombinedReportSummarySection, () => {
                                 ],
                             },
                         },
-                    } as unknown) as CardResult,
-                    ({
+                    } as unknown as CardResult,
+                    {
                         identifiers: {
                             urls: {
                                 urls: ['http://url-fail/1'],
                             },
                         },
-                    } as unknown) as CardResult,
+                    } as unknown as CardResult,
                 ],
             },
         ],
@@ -50,12 +46,12 @@ describe(CombinedReportSummarySection, () => {
     } as CardRuleResultsByStatus;
 
     it('renders', () => {
-        const props = ({
+        const props = {
             urlResultCounts,
             cardsViewData: {
                 cards,
             },
-        } as unknown) as CombinedReportSectionProps;
+        } as unknown as CombinedReportSectionProps;
         const wrapper = shallow(<CombinedReportSummarySection {...props} />);
 
         expect(wrapper.getElement()).toMatchSnapshot();

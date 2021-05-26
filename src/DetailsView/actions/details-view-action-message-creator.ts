@@ -28,10 +28,10 @@ import { Message } from 'common/message';
 import { DevToolActionMessageCreator } from 'common/message-creators/dev-tool-action-message-creator';
 import { Messages } from 'common/messages';
 import { SupportedMouseEvent } from 'common/telemetry-data-factory';
-import { VersionedAssessmentData } from 'common/types/versioned-assessment-data';
 import { DetailsViewPivotType } from 'common/types/details-view-pivot-type';
 import { FailureInstanceData } from 'common/types/failure-instance-data';
 import { ManualTestStatus } from 'common/types/manual-test-status';
+import { VersionedAssessmentData } from 'common/types/versioned-assessment-data';
 import { VisualizationType } from 'common/types/visualization-type';
 import * as React from 'react';
 import { DetailsViewRightContentPanelType } from '../components/left-nav/details-view-right-content-panel-type';
@@ -39,16 +39,6 @@ import { DetailsViewRightContentPanelType } from '../components/left-nav/details
 const messages = Messages.Visualizations;
 
 export class DetailsViewActionMessageCreator extends DevToolActionMessageCreator {
-    public updateIssuesSelectedTargets(selectedTargets: string[]): void {
-        const payload: string[] = selectedTargets;
-        const message: Message = {
-            messageType: messages.Issues.UpdateSelectedTargets,
-            payload,
-        };
-
-        this.dispatcher.dispatchMessage(message);
-    }
-
     public closePreviewFeaturesPanel = (): void => {
         const messageType = Messages.PreviewFeatures.ClosePanel;
         const telemetry = this.telemetryFactory.fromDetailsViewNoTriggeredBy();
@@ -127,7 +117,7 @@ export class DetailsViewActionMessageCreator extends DevToolActionMessageCreator
         this.dispatcher.sendTelemetry(TelemetryEvents.EXPORT_RESULTS, telemetryData);
     }
 
-    public copyIssueDetailsClicked = (event: React.MouseEvent<any>): void => {
+    public copyIssueDetailsClicked = (event: SupportedMouseEvent): void => {
         const telemetryData = this.telemetryFactory.withTriggeredByAndSource(
             event,
             TelemetryEvents.TelemetryEventSource.DetailsView,
@@ -179,6 +169,27 @@ export class DetailsViewActionMessageCreator extends DevToolActionMessageCreator
 
         this.dispatcher.dispatchMessage({
             messageType: Messages.Assessment.SelectTestRequirement,
+            payload: payload,
+        });
+    }
+
+    public selectNextRequirement(
+        event: React.MouseEvent<HTMLElement>,
+        nextRequirement: string,
+        visualizationType: VisualizationType,
+    ): void {
+        const payload: SelectTestSubviewPayload = {
+            telemetry: this.telemetryFactory.forSelectRequirement(
+                event,
+                visualizationType,
+                nextRequirement,
+            ),
+            selectedTestSubview: nextRequirement,
+            selectedTest: visualizationType,
+        };
+
+        this.dispatcher.dispatchMessage({
+            messageType: Messages.Assessment.SelectNextRequirement,
             payload: payload,
         });
     }
@@ -262,7 +273,7 @@ export class DetailsViewActionMessageCreator extends DevToolActionMessageCreator
     ): void {
         const telemetry = sendTelemetry
             ? this.telemetryFactory.forAssessmentActionFromDetailsViewNoTriggeredBy(test)
-            : null;
+            : undefined;
         const payload: AssessmentToggleActionPayload = {
             test,
             requirement,
@@ -508,11 +519,10 @@ export class DetailsViewActionMessageCreator extends DevToolActionMessageCreator
         requirement: string,
     ): void {
         const telemetry = this.telemetryFactory.fromDetailsViewNoTriggeredBy();
-        const payload: ChangeInstanceSelectionPayload = {
+        const payload: Omit<ChangeInstanceSelectionPayload, 'selector'> = {
             test: test,
             requirement: requirement,
             isVisualizationEnabled: isVisualizationEnabled,
-            selector: null,
             telemetry: telemetry,
         };
 
@@ -533,14 +543,32 @@ export class DetailsViewActionMessageCreator extends DevToolActionMessageCreator
         });
     };
 
-    public loadAssessment = (assessmentData: VersionedAssessmentData): void => {
+    public loadAssessment = (assessmentData: VersionedAssessmentData, tabId: number): void => {
         const telemetry = this.telemetryFactory.fromDetailsViewNoTriggeredBy();
         const payload: LoadAssessmentPayload = {
             telemetry: telemetry,
             versionedAssessmentData: assessmentData,
+            tabId,
         };
+        const setDetailsViewRightContentPanelPayload: DetailsViewRightContentPanelType = 'Overview';
+        this.dispatcher.dispatchMessage({
+            messageType: Messages.Visualizations.DetailsView.SetDetailsViewRightContentPanel,
+            payload: setDetailsViewRightContentPanelPayload,
+        });
         this.dispatcher.dispatchMessage({
             messageType: Messages.Assessment.LoadAssessment,
+            payload,
+        });
+    };
+
+    public saveAssessment = (event: React.MouseEvent<any>): void => {
+        const telemetry = this.telemetryFactory.fromDetailsView(event);
+        const payload: BaseActionPayload = {
+            telemetry: telemetry,
+        };
+
+        this.dispatcher.dispatchMessage({
+            messageType: Messages.Assessment.SaveAssessment,
             payload,
         });
     };

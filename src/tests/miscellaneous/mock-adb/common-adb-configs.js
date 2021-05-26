@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+const path = require('path');
 const { apkVersionName } = require('accessibility-insights-for-android-service-bin');
 const cloneDeep = require('lodash/cloneDeep');
-const path = require('path');
 
 const successfulTestServerContentPath = path.join(
     __dirname,
@@ -15,6 +15,11 @@ const serviceInfoCommandMatch =
 const serviceIsRunningCommandMatch = 'shell dumpsys accessibility';
 const portForwardingCommandMatch = 'forward tcp:';
 const sdkVersionCommandMatch = 'shell getprop ro.build.version.sdk';
+const inputKeyeventCommandMatch = 'shell input keyevent';
+const resetOverlayPermissionCommandMatch =
+    'shell cmd appops reset com.microsoft.accessibilityinsightsforandroidservice';
+const grantOverlayPermissionCommandMatch =
+    'shell pm grant com.microsoft.accessibilityinsightsforandroidservice android.permission.SYSTEM_ALERT_WINDOW';
 
 function addDeviceEnumerationCommands(id, output) {
     output[`-s ${id} ${devicesCommandMatch}`] = cloneDeep(output.devices);
@@ -37,12 +42,10 @@ function addDetectServiceCommands(id, output) {
 function addCheckPermissionsCommands(id, output) {
     // These commands appear in the order that they get called by appium-adb
     output[`-s ${id} ${serviceIsRunningCommandMatch}`] = {
-        stdout:
-            '                     Service[label=Accessibility Insights for…, feedbackType[FEEDBACK_SPOKEN, FEEDBACK_HAPTIC, FEEDBACK_AUDIBLE, FEEDBACK_VISUAL, FEEDBACK_GENERIC, FEEDBACK_BRAILLE], capabilities=1, eventTypes=TYPES_ALL_MASK, notificationTimeout=0]}',
+        stdout: '                     Service[label=Accessibility Insights for…, feedbackType[FEEDBACK_SPOKEN, FEEDBACK_HAPTIC, FEEDBACK_AUDIBLE, FEEDBACK_VISUAL, FEEDBACK_GENERIC, FEEDBACK_BRAILLE], capabilities=1, eventTypes=TYPES_ALL_MASK, notificationTimeout=0]}',
     };
     output[`-s ${id} shell dumpsys media_projection`] = {
-        stdout:
-            '(com.microsoft.accessibilityinsightsforandroidservice, uid=12354): TYPE_SCREEN_CAPTURE',
+        stdout: '(com.microsoft.accessibilityinsightsforandroidservice, uid=12354): TYPE_SCREEN_CAPTURE',
     };
 }
 
@@ -58,8 +61,7 @@ function addInstallServiceCommands(id, output) {
         stdout: '--streaming: force streaming APK directly into Package Manager',
     };
     output[`-s ${id} features`] = {
-        stdout:
-            'abb_exec\nfixed_push_symlink_timestamp\nabb\nstat_v2\napex\nshell_v2\nfixed_push_mkdir\ncmd',
+        stdout: 'abb_exec\nfixed_push_symlink_timestamp\nabb\nstat_v2\napex\nshell_v2\nfixed_push_mkdir\ncmd',
     };
     output[`-s ${id} shell ls -t -1 /data/local/tmp/appium_cache 2>&1 || echo _ERROR_`] = {
         stdout: '',
@@ -93,6 +95,30 @@ function addPortForwardingCommands(id, output, port) {
     };
 }
 
+function addInputKeyeventCommands(id, output) {
+    // These are the values thr virtual keyboard uses for focus testing.
+    // See KevEventCode in src/electron/platform/android/adb-wrapper.ts
+    const keyeventCodeMap = {
+        up: 19,
+        down: 20,
+        left: 21,
+        right: 22,
+        tab: 61,
+        enter: 66,
+    };
+
+    for (const keyeventCode of Object.values(keyeventCodeMap)) {
+        output[`-s ${id} ${inputKeyeventCommandMatch} ${keyeventCode}`] = {
+            stdout: '',
+        };
+    }
+}
+
+function addGrantOverlayPermissionCommands(id, output) {
+    output[`-s ${id} ${resetOverlayPermissionCommandMatch}`] = {};
+    output[`-s ${id} ${grantOverlayPermissionCommandMatch}`] = {};
+}
+
 function workingDeviceCommands(deviceIds, port) {
     const output = {
         'start-server': {},
@@ -112,7 +138,9 @@ function workingDeviceCommands(deviceIds, port) {
         addDetectServiceCommands(id, output);
         addInstallServiceCommands(id, output);
         addCheckPermissionsCommands(id, output);
+        addGrantOverlayPermissionCommands(id, output);
         addPortForwardingCommands(id, output, port);
+        addInputKeyeventCommands(id, output);
     }
 
     return output;
@@ -163,6 +191,10 @@ function simulatePortForwardingError(oldConfig) {
     return cloneWithDisabledPattern(oldConfig, portForwardingCommandMatch);
 }
 
+function simulateInputKeyeventError(oldConfig) {
+    return cloneWithDisabledPattern(oldConfig, inputKeyeventCommandMatch);
+}
+
 const physicalDeviceName1 = 'device-1';
 const physicalDeviceName2 = 'device-2';
 const emulatorDeviceName = 'emulator-3';
@@ -188,4 +220,5 @@ module.exports = {
     simulateServiceNotInstalled,
     simulateServiceLacksPermissions,
     simulatePortForwardingError,
+    simulateInputKeyeventError,
 };

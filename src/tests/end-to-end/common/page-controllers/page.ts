@@ -1,9 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+import { createDefaultPromiseFactory } from 'common/promises/promise-factory';
 import { includes } from 'lodash';
 import * as Playwright from 'playwright';
 
-import { createDefaultPromiseFactory } from 'common/promises/promise-factory';
+import { serializeError } from 'tests/common/serialize-error';
 import {
     PageFunction,
     WaitForSelectorOptions,
@@ -16,7 +17,6 @@ import {
     DEFAULT_NEW_PAGE_WAIT_TIMEOUT_MS,
     DEFAULT_PAGE_ELEMENT_WAIT_TIMEOUT_MS,
 } from '../timeouts';
-import { serializeError } from 'tests/common/serialize-error';
 
 const promiseFactory = createDefaultPromiseFactory();
 
@@ -203,10 +203,23 @@ export class Page {
         await this.underlyingPage.setViewportSize({ width, height });
     }
 
+    // Avoid using this if possible; tests that rely on this are basically guaranteed to be flaky.
+    // Instead, prefer waiting for specific conditions in the page (selectors to appear/disappear,
+    // network events, etc).
+    public async waitForTimeout(timeoutMilliseconds: number): Promise<void> {
+        await this.underlyingPage.waitForTimeout(timeoutMilliseconds);
+    }
+
     private async screenshotOnError<T>(wrappedFunction: () => Promise<T>): Promise<T> {
         return await screenshotOnError(
             path => this.underlyingPage.screenshot({ path, fullPage: true }),
             wrappedFunction,
         );
+    }
+
+    public async setFileForUpload(filepath: string) {
+        this.underlyingPage.once('filechooser', async fileChooser => {
+            await fileChooser.element().setInputFiles(filepath);
+        });
     }
 }

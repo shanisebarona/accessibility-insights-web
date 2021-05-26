@@ -1,10 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 import { getRTL } from '@uifabric/utilities';
+import * as axe from 'axe-core';
 import { BrowserAdapterFactory } from 'common/browser-adapters/browser-adapter-factory';
+import { WebVisualizationConfigurationFactory } from 'common/configs/web-visualization-configuration-factory';
 import { createDefaultLogger } from 'common/logging/default-logger';
 import { NavigatorUtils } from 'common/navigator-utils';
-import * as Q from 'q';
+import { createDefaultPromiseFactory } from 'common/promises/promise-factory';
+import { AxeFrameMessenger } from 'injected/frameCommunicators/axe-frame-messenger';
+import { BackchannelWindowMessageTranslator } from 'injected/frameCommunicators/backchannel-window-message-translator';
+import { BrowserBackchannelWindowMessagePoster } from 'injected/frameCommunicators/browser-backchannel-window-message-poster';
+import { FrameMessenger } from 'injected/frameCommunicators/frame-messenger';
+import { RespondableCommandMessageCommunicator } from 'injected/frameCommunicators/respondable-command-message-communicator';
+import { getUniqueSelector } from 'scanner/axe-utils';
 import * as UAParser from 'ua-parser-js';
 import { AppDataAdapter } from '../common/browser-adapters/app-data-adapter';
 import { BrowserAdapter } from '../common/browser-adapters/browser-adapter';
@@ -14,7 +22,6 @@ import { HTMLElementUtils } from '../common/html-element-utils';
 import { VisualizationType } from '../common/types/visualization-type';
 import { generateUID } from '../common/uid-generator';
 import { WindowUtils } from '../common/window-utils';
-import { scan } from '../scanner/exposed-apis';
 import { Assessments } from './../assessments/assessments';
 import { ClientUtils } from './client-utils';
 import { rootContainerId } from './constants';
@@ -23,12 +30,8 @@ import { DrawingController } from './drawing-controller';
 import { ElementFinderByPath } from './element-finder-by-path';
 import { ElementFinderByPosition } from './element-finder-by-position';
 import { FrameUrlFinder } from './frame-url-finder';
-import { FrameCommunicator } from './frameCommunicators/frame-communicator';
 import { HtmlElementAxeResultsHelper } from './frameCommunicators/html-element-axe-results-helper';
 import { ScrollingController } from './frameCommunicators/scrolling-controller';
-import { WindowMessageHandler } from './frameCommunicators/window-message-handler';
-import { WindowMessageMarshaller } from './frameCommunicators/window-message-marshaller';
-import { ScannerUtils } from './scanner-utils';
 import { ShadowInitializer } from './shadow-initializer';
 import { ShadowUtils } from './shadow-utils';
 import { TabStopsListener } from './tab-stops-listener';
@@ -37,12 +40,14 @@ import { DrawerProvider } from './visualization/drawer-provider';
 import { DrawerUtils } from './visualization/drawer-utils';
 import { RootContainerCreator } from './visualization/root-container-creator';
 
+// Required to initialize axe-core with our ruleset/branding
+import 'scanner/exposed-apis';
+
 export class WindowInitializer {
     public shadowInitializer: any;
     protected browserAdapter: BrowserAdapter;
     protected appDataAdapter: AppDataAdapter;
     protected windowUtils: WindowUtils;
-    protected frameCommunicator: FrameCommunicator;
     protected drawingController: DrawingController;
     protected scrollingController: ScrollingController;
     protected tabStopsListener: TabStopsListener;
@@ -50,8 +55,10 @@ export class WindowInitializer {
     protected elementFinderByPosition: ElementFinderByPosition;
     protected elementFinderByPath: ElementFinderByPath;
     protected clientUtils: ClientUtils;
-    protected scannerUtils: ScannerUtils;
     protected visualizationConfigurationFactory: VisualizationConfigurationFactory;
+    protected frameMessenger: FrameMessenger;
+    protected respondableCommandMessageCommunicator: RespondableCommandMessageCommunicator;
+    protected windowMessagePoster: BrowserBackchannelWindowMessagePoster;
 
     public async initialize(): Promise<void> {
         const asyncInitializationSteps: Promise<void>[] = [];
@@ -65,7 +72,6 @@ export class WindowInitializer {
         const htmlElementUtils = new HTMLElementUtils();
         this.clientUtils = new ClientUtils(window);
         const logger = createDefaultLogger();
-        this.scannerUtils = new ScannerUtils(scan, logger);
 
         new RootContainerCreator(htmlElementUtils).create(rootContainerId);
 
@@ -76,23 +82,42 @@ export class WindowInitializer {
         );
         asyncInitializationSteps.push(this.shadowInitializer.initialize());
 
-        this.visualizationConfigurationFactory = new VisualizationConfigurationFactory();
+        this.visualizationConfigurationFactory = new WebVisualizationConfigurationFactory();
 
-        const windowMessageHandler = new WindowMessageHandler(
+        const backchannelWindowMessageTranslator = new BackchannelWindowMessageTranslator(
+            this.browserAdapter,
             this.windowUtils,
-            new WindowMessageMarshaller(this.browserAdapter, generateUID),
+            generateUID,
         );
-        this.frameCommunicator = new FrameCommunicator(
-            windowMessageHandler,
-            htmlElementUtils,
-            Q,
+
+        this.windowMessagePoster = new BrowserBackchannelWindowMessagePoster(
+            this.windowUtils,
+            this.browserAdapter,
+            backchannelWindowMessageTranslator,
+        );
+
+        this.respondableCommandMessageCommunicator = new RespondableCommandMessageCommunicator(
+            this.windowMessagePoster,
+            generateUID,
+            createDefaultPromiseFactory(),
             logger,
         );
+
+        this.frameMessenger = new FrameMessenger(this.respondableCommandMessageCommunicator);
+        const axeFrameMessenger = new AxeFrameMessenger(
+            this.respondableCommandMessageCommunicator,
+            this.windowUtils,
+            logger,
+        );
+
+        axeFrameMessenger.registerGlobally(axe);
+
         this.tabStopsListener = new TabStopsListener(
-            this.frameCommunicator,
+            this.frameMessenger,
             this.windowUtils,
             htmlElementUtils,
-            this.scannerUtils,
+            getUniqueSelector,
+            document,
         );
         const drawerProvider = new DrawerProvider(
             htmlElementUtils,
@@ -102,28 +127,25 @@ export class WindowInitializer {
             new DrawerUtils(document),
             this.clientUtils,
             document,
-            this.frameCommunicator,
+            this.frameMessenger,
             this.browserAdapter,
             getRTL,
-            new DetailsDialogHandler(htmlElementUtils),
+            new DetailsDialogHandler(htmlElementUtils, this.windowUtils),
         );
         this.drawingController = new DrawingController(
-            this.frameCommunicator,
+            this.frameMessenger,
             new HtmlElementAxeResultsHelper(htmlElementUtils, logger),
             htmlElementUtils,
         );
-        this.scrollingController = new ScrollingController(
-            this.frameCommunicator,
-            htmlElementUtils,
-        );
+        this.scrollingController = new ScrollingController(this.frameMessenger, htmlElementUtils);
         this.frameUrlFinder = new FrameUrlFinder(
-            this.frameCommunicator,
+            this.frameMessenger,
             this.windowUtils,
             htmlElementUtils,
         );
-        windowMessageHandler.initialize();
+        this.windowMessagePoster.initialize();
+        this.respondableCommandMessageCommunicator.initialize();
         this.tabStopsListener.initialize();
-        this.frameCommunicator.initialize();
         this.drawingController.initialize();
         this.scrollingController.initialize();
         this.frameUrlFinder.initialize();
@@ -134,6 +156,7 @@ export class WindowInitializer {
             Assessments,
             drawerProvider,
         );
+
         EnumHelper.getNumericValues(VisualizationType).forEach(
             visualizationTypeDrawerRegistrar.registerType,
         );
@@ -142,17 +165,14 @@ export class WindowInitializer {
         port.onDisconnect.addListener(() => this.dispose());
 
         this.elementFinderByPosition = new ElementFinderByPosition(
-            this.frameCommunicator,
+            this.frameMessenger,
             this.clientUtils,
-            this.scannerUtils,
+            getUniqueSelector,
             document,
         );
         this.elementFinderByPosition.initialize();
 
-        this.elementFinderByPath = new ElementFinderByPath(
-            htmlElementUtils,
-            this.frameCommunicator,
-        );
+        this.elementFinderByPath = new ElementFinderByPath(htmlElementUtils, this.frameMessenger);
         this.elementFinderByPath.initialize();
 
         await Promise.all(asyncInitializationSteps);
@@ -160,5 +180,6 @@ export class WindowInitializer {
 
     protected dispose(): void {
         this.drawingController.dispose();
+        this.windowMessagePoster.dispose();
     }
 }

@@ -132,7 +132,7 @@
       .ms-Fabric.is-focusVisible .ms-Nav-group .ms-nav-linkButton:focus::after {
         border: 1px solid var(--neutral-100);
       }
-      @media screen and (-ms-high-contrast: active) {
+      @media screen and (forced-colors: active) {
         .ms-Fabric.is-focusVisible
           .ms-Nav-group
           .ms-nav-linkButton:focus::after {
@@ -932,24 +932,6 @@
         height: 1px;
         overflow: hidden;
       }
-      .toast-container--YaZxW {
-        display: inline-block;
-      }
-      .toast-content--Wt0Lj {
-        background: var(--neutral-70);
-        border-radius: 4px;
-        color: var(--neutral-0);
-        padding-left: 20px;
-        padding-top: 14px;
-        padding-bottom: 14px;
-        padding-right: 20px;
-        width: 316px;
-        margin-left: calc(316px / -2 - 20px);
-        left: 50%;
-        bottom: 20px;
-        z-index: 1000;
-        position: absolute;
-      }
       .how-to-fix-content--2-Pc1 {
         margin-bottom: 16px;
       }
@@ -999,6 +981,24 @@
         + .action-cancel-button-col--2EdOO {
         margin-left: 8px;
       }
+      .toast-container--YaZxW {
+        display: inline-block;
+      }
+      .toast-content--Wt0Lj {
+        background: var(--neutral-70);
+        border-radius: 4px;
+        color: var(--neutral-0);
+        padding-left: 20px;
+        padding-top: 14px;
+        padding-bottom: 14px;
+        padding-right: 20px;
+        width: 316px;
+        margin-left: calc(316px / -2 - 20px);
+        left: 50%;
+        bottom: 20px;
+        z-index: 1000;
+        position: absolute;
+      }
       div.kebab-menu-callout--14fgT {
         box-shadow: 0px 6.4px 14.4px var(--box-shadow-132),
           0px 1.2px 3.6px var(--box-shadow-108);
@@ -1038,7 +1038,7 @@
       button.kebab-menu-button--2aa2O svg {
         stroke: var(--primary-text);
       }
-      @media screen and (-ms-high-contrast: active) {
+      @media screen and (forced-colors: active) {
         button.kebab-menu-button--2aa2O svg {
           fill: inherit !important;
         }
@@ -1692,6 +1692,7 @@
             class="outcome-summary-bar"
             aria-label="0 Failed, 0 Not scanned, 2 Passed"
             role="img"
+            data-automation-id="outcome-summary-bar"
             ><div style="flex-grow: 0"
               ><span class="fail summary-bar-left-edge"
                 ><span aria-hidden="true"
@@ -2086,8 +2087,9 @@
       ><div class="report-footer" role="contentinfo"
         >This automated checks result was generated using the Mock Service Name
         that helps find some of the most common accessibility issues. The scan
-        was performed using axe-core mock.axe.version and Mock user agent. For a
-        complete WCAG 2.1 compliance assessment please visit
+        was performed in a clean browser environment, using axe-core
+        mock.axe.version and Mock user agent with a display resolution of
+        1920x1080. For a complete WCAG 2.1 compliance assessment please visit
         <a
           target="_blank"
           href="http://aka.ms/AccessibilityInsights"

@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 import { CommonInstancesSectionProps } from 'common/components/cards/common-instances-section-props';
 import { VisualizationConfiguration } from 'common/configs/visualization-configuration';
-import { DisplayableVisualizationTypeData } from 'common/configs/visualization-configuration-factory';
 import { NamedFC } from 'common/react/named-fc';
+import { DisplayableVisualizationTypeData } from 'common/types/displayable-visualization-type-data';
 import {
     ScanData,
     TestsEnabledState,
@@ -59,6 +59,7 @@ describe('DetailsListIssuesView', () => {
                 allCardsCollapsed: true,
             },
             instancesSection: NamedFC<CommonInstancesSectionProps>('test', _ => null),
+            featureFlagStoreData: {},
         } as DetailsListIssuesViewProps;
 
         getStoreDataMock

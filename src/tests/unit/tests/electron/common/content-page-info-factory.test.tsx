@@ -1,11 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import * as React from 'react';
-import { TestConfig } from 'electron/types/test-config';
-import { ContentPageInfo, ContentPagesInfo } from 'electron/types/content-page-info';
-import { createContentPagesInfo } from 'electron/common/content-page-info-factory';
-import { NamedFC } from 'common/react/named-fc';
 import { CommonInstancesSectionProps } from 'common/components/cards/common-instances-section-props';
+import { NamedFC } from 'common/react/named-fc';
+import { createContentPagesInfo } from 'electron/common/content-page-info-factory';
+import {
+    ContentPageInfo,
+    ContentPagesInfo,
+    StartOverButtonSettings,
+} from 'electron/types/content-page-info';
+import { TestConfig } from 'electron/types/test-config';
+import { ReflowCommandBarProps } from 'electron/views/results/components/reflow-command-bar';
+import * as React from 'react';
 
 describe('createContentPagesInfo', () => {
     it('creates array of ContentPageInfo objects as expected', () => {
@@ -42,6 +47,13 @@ describe('createContentPagesInfo', () => {
             ),
             resultsFilter: _ => true,
             allowsExportReport: true,
+            visualHelperSection: null,
+            startOverButtonSettings(_: ReflowCommandBarProps): StartOverButtonSettings {
+                return {
+                    onClick: () => {},
+                    disabled: false,
+                };
+            },
         };
     }
 });
