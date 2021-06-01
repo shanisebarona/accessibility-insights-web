@@ -12,14 +12,14 @@ exports[`DetailsViewCommandBar renders with buttons collapsed into a menu 1`] = 
       </span>
     </NewTabLinkWithTooltip>
   </div>
-  <CommandBarButtonsMenu renderExportReportButton={[Function]} renderSaveAssessmentButton={[Function]} renderLoadAssessmentButton={[Function]} featureFlagStoreData={{...}} getStartOverMenuItem={[Function]} buttonRef={[Function: buttonRef]} />
-  <InvalidLoadAssessmentDialog deps={{...}} assessmentStoreData={{...}} tabStoreData={{...}} switcherNavConfiguration={{...}} scanMetadata={{...}} narrowModeStatus={{...}} featureFlagStoreData={{...}} isOpen={false} onClose={[Function]} />
-  <LoadAssessmentDialog deps={{...}} assessmentStoreData={{...}} tabStoreData={{...}} switcherNavConfiguration={{...}} scanMetadata={{...}} narrowModeStatus={{...}} featureFlagStoreData={{...}} isOpen={false} prevTab={{...}} loadedAssessmentData={{...}} tabId={5} onClose={[Function]} />
-  <StartOverDialog deps={{...}} assessmentStoreData={{...}} tabStoreData={{...}} switcherNavConfiguration={{...}} scanMetadata={{...}} narrowModeStatus={{...}} featureFlagStoreData={{...}} dialogState=\\"none\\" dismissDialog={[Function]} />
+  <CommandBarButtonsMenu renderExportReportButton={[Function]} renderSaveAssessmentButton={[Function]} renderLoadAssessmentButton={[Function]} getStartOverMenuItem={[Function]} buttonRef={[Function: buttonRef]} />
+  <InvalidLoadAssessmentDialog deps={{...}} assessmentStoreData={{...}} tabStoreData={{...}} switcherNavConfiguration={{...}} scanMetadata={{...}} narrowModeStatus={{...}} isOpen={false} onClose={[Function]} />
+  <LoadAssessmentDialog deps={{...}} assessmentStoreData={{...}} tabStoreData={{...}} switcherNavConfiguration={{...}} scanMetadata={{...}} narrowModeStatus={{...}} isOpen={false} prevTab={{...}} loadedAssessmentData={{...}} tabId={5} onClose={[Function]} />
+  <StartOverDialog deps={{...}} assessmentStoreData={{...}} tabStoreData={{...}} switcherNavConfiguration={{...}} scanMetadata={{...}} narrowModeStatus={{...}} dialogState=\\"none\\" dismissDialog={[Function]} />
 </div>"
 `;
 
-exports[`DetailsViewCommandBar renders with export button, save assessment, load, assessment, and start over 1`] = `
+exports[`DetailsViewCommandBar renders with export button and start over 1`] = `
 <div
   aria-label="command bar"
   className="detailsViewCommandBar"
@@ -55,27 +55,9 @@ exports[`DetailsViewCommandBar renders with export button, save assessment, load
       buttonRef={[Function]}
       showReportExportDialog={[Function]}
     />
-    <FlaggedComponent
-      enableJSXElement={
-        <div>
-          Save assessment
-        </div>
-      }
-      featureFlag="saveAndLoadAssessment"
-      featureFlagStoreData={
-        Object {
-          "saveAndLoadAssessment": true,
-        }
-      }
-    />
-    <FlaggedComponent
-      featureFlag="saveAndLoadAssessment"
-      featureFlagStoreData={
-        Object {
-          "saveAndLoadAssessment": true,
-        }
-      }
-    />
+    <div>
+      Save assessment
+    </div>
     <CustomizedActionButton>
       Start Over Component
     </CustomizedActionButton>
@@ -127,11 +109,6 @@ exports[`DetailsViewCommandBar renders with export button, save assessment, load
         },
       }
     }
-    featureFlagStoreData={
-      Object {
-        "saveAndLoadAssessment": true,
-      }
-    }
     isOpen={false}
     narrowModeStatus={
       Object {
@@ -210,11 +187,6 @@ exports[`DetailsViewCommandBar renders with export button, save assessment, load
           "undoManualRequirementStatusChange": [Function],
           "undoManualTestStatusChange": [Function],
         },
-      }
-    }
-    featureFlagStoreData={
-      Object {
-        "saveAndLoadAssessment": true,
       }
     }
     isOpen={false}
@@ -310,11 +282,6 @@ exports[`DetailsViewCommandBar renders with export button, save assessment, load
     }
     dialogState="none"
     dismissDialog={[Function]}
-    featureFlagStoreData={
-      Object {
-        "saveAndLoadAssessment": true,
-      }
-    }
     narrowModeStatus={
       Object {
         "isCommandBarCollapsed": false,
@@ -352,7 +319,7 @@ exports[`DetailsViewCommandBar renders with export button, save assessment, load
 </div>
 `;
 
-exports[`DetailsViewCommandBar renders with export button, without save assessment, without load assessment, without start over 1`] = `
+exports[`DetailsViewCommandBar renders with export button, without start over 1`] = `
 <div
   aria-label="command bar"
   className="detailsViewCommandBar"
@@ -388,27 +355,9 @@ exports[`DetailsViewCommandBar renders with export button, without save assessme
       buttonRef={[Function]}
       showReportExportDialog={[Function]}
     />
-    <FlaggedComponent
-      enableJSXElement={
-        <div>
-          Save assessment
-        </div>
-      }
-      featureFlag="saveAndLoadAssessment"
-      featureFlagStoreData={
-        Object {
-          "saveAndLoadAssessment": false,
-        }
-      }
-    />
-    <FlaggedComponent
-      featureFlag="saveAndLoadAssessment"
-      featureFlagStoreData={
-        Object {
-          "saveAndLoadAssessment": false,
-        }
-      }
-    />
+    <div>
+      Save assessment
+    </div>
   </div>
   <div>
     Export dialog
@@ -457,11 +406,6 @@ exports[`DetailsViewCommandBar renders with export button, without save assessme
         },
       }
     }
-    featureFlagStoreData={
-      Object {
-        "saveAndLoadAssessment": false,
-      }
-    }
     isOpen={false}
     narrowModeStatus={
       Object {
@@ -541,11 +485,6 @@ exports[`DetailsViewCommandBar renders with export button, without save assessme
           "undoManualTestStatusChange": [Function],
           "uploadAssessment": [Function],
         },
-      }
-    }
-    featureFlagStoreData={
-      Object {
-        "saveAndLoadAssessment": false,
       }
     }
     isOpen={false}
@@ -641,11 +580,6 @@ exports[`DetailsViewCommandBar renders with export button, without save assessme
     }
     dialogState="none"
     dismissDialog={[Function]}
-    featureFlagStoreData={
-      Object {
-        "saveAndLoadAssessment": false,
-      }
-    }
     narrowModeStatus={
       Object {
         "isCommandBarCollapsed": false,
@@ -719,14 +653,6 @@ exports[`DetailsViewCommandBar renders with invalid load assessment dialog hidde
       buttonRef={[Function]}
       showReportExportDialog={[Function]}
     />
-    <FlaggedComponent
-      featureFlag="saveAndLoadAssessment"
-      featureFlagStoreData={Object {}}
-    />
-    <FlaggedComponent
-      featureFlag="saveAndLoadAssessment"
-      featureFlagStoreData={Object {}}
-    />
   </div>
   <InvalidLoadAssessmentDialog
     assessmentStoreData={
@@ -773,7 +699,6 @@ exports[`DetailsViewCommandBar renders with invalid load assessment dialog hidde
         },
       }
     }
-    featureFlagStoreData={Object {}}
     isOpen={false}
     narrowModeStatus={
       Object {
@@ -854,7 +779,6 @@ exports[`DetailsViewCommandBar renders with invalid load assessment dialog hidde
         },
       }
     }
-    featureFlagStoreData={Object {}}
     isOpen={false}
     loadedAssessmentData={null}
     narrowModeStatus={
@@ -947,7 +871,6 @@ exports[`DetailsViewCommandBar renders with invalid load assessment dialog hidde
     }
     dialogState="none"
     dismissDialog={[Function]}
-    featureFlagStoreData={Object {}}
     narrowModeStatus={
       Object {
         "isCommandBarCollapsed": false,
@@ -1021,14 +944,6 @@ exports[`DetailsViewCommandBar renders with invalid load assessment dialog open 
       buttonRef={[Function]}
       showReportExportDialog={[Function]}
     />
-    <FlaggedComponent
-      featureFlag="saveAndLoadAssessment"
-      featureFlagStoreData={Object {}}
-    />
-    <FlaggedComponent
-      featureFlag="saveAndLoadAssessment"
-      featureFlagStoreData={Object {}}
-    />
   </div>
   <InvalidLoadAssessmentDialog
     assessmentStoreData={
@@ -1074,7 +989,6 @@ exports[`DetailsViewCommandBar renders with invalid load assessment dialog open 
         },
       }
     }
-    featureFlagStoreData={Object {}}
     isOpen={true}
     narrowModeStatus={
       Object {
@@ -1155,7 +1069,6 @@ exports[`DetailsViewCommandBar renders with invalid load assessment dialog open 
         },
       }
     }
-    featureFlagStoreData={Object {}}
     isOpen={false}
     loadedAssessmentData={null}
     narrowModeStatus={
@@ -1248,7 +1161,6 @@ exports[`DetailsViewCommandBar renders with invalid load assessment dialog open 
     }
     dialogState="none"
     dismissDialog={[Function]}
-    featureFlagStoreData={Object {}}
     narrowModeStatus={
       Object {
         "isCommandBarCollapsed": false,
@@ -1335,14 +1247,6 @@ exports[`DetailsViewCommandBar renders with load assessment dialog hidden 1`] = 
       buttonRef={[Function]}
       showReportExportDialog={[Function]}
     />
-    <FlaggedComponent
-      featureFlag="saveAndLoadAssessment"
-      featureFlagStoreData={Object {}}
-    />
-    <FlaggedComponent
-      featureFlag="saveAndLoadAssessment"
-      featureFlagStoreData={Object {}}
-    />
   </div>
   <InvalidLoadAssessmentDialog
     assessmentStoreData={
@@ -1388,7 +1292,6 @@ exports[`DetailsViewCommandBar renders with load assessment dialog hidden 1`] = 
         },
       }
     }
-    featureFlagStoreData={Object {}}
     isOpen={false}
     narrowModeStatus={
       Object {
@@ -1469,7 +1372,6 @@ exports[`DetailsViewCommandBar renders with load assessment dialog hidden 1`] = 
         },
       }
     }
-    featureFlagStoreData={Object {}}
     isOpen={false}
     loadedAssessmentData={null}
     narrowModeStatus={
@@ -1562,7 +1464,6 @@ exports[`DetailsViewCommandBar renders with load assessment dialog hidden 1`] = 
     }
     dialogState="none"
     dismissDialog={[Function]}
-    featureFlagStoreData={Object {}}
     narrowModeStatus={
       Object {
         "isCommandBarCollapsed": false,
@@ -1636,14 +1537,6 @@ exports[`DetailsViewCommandBar renders with load assessment dialog open 1`] = `
       buttonRef={[Function]}
       showReportExportDialog={[Function]}
     />
-    <FlaggedComponent
-      featureFlag="saveAndLoadAssessment"
-      featureFlagStoreData={Object {}}
-    />
-    <FlaggedComponent
-      featureFlag="saveAndLoadAssessment"
-      featureFlagStoreData={Object {}}
-    />
   </div>
   <InvalidLoadAssessmentDialog
     assessmentStoreData={
@@ -1689,7 +1582,6 @@ exports[`DetailsViewCommandBar renders with load assessment dialog open 1`] = `
         },
       }
     }
-    featureFlagStoreData={Object {}}
     isOpen={false}
     narrowModeStatus={
       Object {
@@ -1770,7 +1662,6 @@ exports[`DetailsViewCommandBar renders with load assessment dialog open 1`] = `
         },
       }
     }
-    featureFlagStoreData={Object {}}
     isOpen={true}
     loadedAssessmentData={null}
     narrowModeStatus={
@@ -1863,7 +1754,6 @@ exports[`DetailsViewCommandBar renders with load assessment dialog open 1`] = `
     }
     dialogState="none"
     dismissDialog={[Function]}
-    featureFlagStoreData={Object {}}
     narrowModeStatus={
       Object {
         "isCommandBarCollapsed": false,
@@ -1937,14 +1827,6 @@ exports[`DetailsViewCommandBar renders with report export dialog open 1`] = `
       buttonRef={[Function]}
       showReportExportDialog={[Function]}
     />
-    <FlaggedComponent
-      featureFlag="saveAndLoadAssessment"
-      featureFlagStoreData={Object {}}
-    />
-    <FlaggedComponent
-      featureFlag="saveAndLoadAssessment"
-      featureFlagStoreData={Object {}}
-    />
   </div>
   <InvalidLoadAssessmentDialog
     assessmentStoreData={
@@ -1990,7 +1872,6 @@ exports[`DetailsViewCommandBar renders with report export dialog open 1`] = `
         },
       }
     }
-    featureFlagStoreData={Object {}}
     isOpen={false}
     narrowModeStatus={
       Object {
@@ -2071,7 +1952,6 @@ exports[`DetailsViewCommandBar renders with report export dialog open 1`] = `
         },
       }
     }
-    featureFlagStoreData={Object {}}
     isOpen={false}
     loadedAssessmentData={null}
     narrowModeStatus={
@@ -2164,7 +2044,6 @@ exports[`DetailsViewCommandBar renders with report export dialog open 1`] = `
     }
     dialogState="none"
     dismissDialog={[Function]}
-    featureFlagStoreData={Object {}}
     narrowModeStatus={
       Object {
         "isCommandBarCollapsed": false,
@@ -2231,12 +2110,10 @@ exports[`DetailsViewCommandBar renders with start assessment over dialog open 1`
   </div>
   <div className=\\"detailsViewCommandButtons\\">
     <ReportExportButton showReportExportDialog={[Function]} buttonRef={[Function: buttonRef]} />
-    <FlaggedComponent featureFlag=\\"saveAndLoadAssessment\\" featureFlagStoreData={{...}} enableJSXElement={[undefined]} />
-    <FlaggedComponent featureFlag=\\"saveAndLoadAssessment\\" featureFlagStoreData={{...}} enableJSXElement={[undefined]} />
   </div>
-  <InvalidLoadAssessmentDialog deps={{...}} assessmentStoreData={{...}} tabStoreData={{...}} switcherNavConfiguration={{...}} scanMetadata={{...}} narrowModeStatus={{...}} featureFlagStoreData={{...}} isOpen={false} onClose={[Function]} />
-  <LoadAssessmentDialog deps={{...}} assessmentStoreData={{...}} tabStoreData={{...}} switcherNavConfiguration={{...}} scanMetadata={{...}} narrowModeStatus={{...}} featureFlagStoreData={{...}} isOpen={false} prevTab={{...}} loadedAssessmentData={{...}} tabId={5} onClose={[Function]} />
-  <StartOverDialog deps={{...}} assessmentStoreData={{...}} tabStoreData={{...}} switcherNavConfiguration={{...}} scanMetadata={{...}} narrowModeStatus={{...}} featureFlagStoreData={{...}} dialogState=\\"assessment\\" dismissDialog={[Function]} />
+  <InvalidLoadAssessmentDialog deps={{...}} assessmentStoreData={{...}} tabStoreData={{...}} switcherNavConfiguration={{...}} scanMetadata={{...}} narrowModeStatus={{...}} isOpen={false} onClose={[Function]} />
+  <LoadAssessmentDialog deps={{...}} assessmentStoreData={{...}} tabStoreData={{...}} switcherNavConfiguration={{...}} scanMetadata={{...}} narrowModeStatus={{...}} isOpen={false} prevTab={{...}} loadedAssessmentData={{...}} tabId={5} onClose={[Function]} />
+  <StartOverDialog deps={{...}} assessmentStoreData={{...}} tabStoreData={{...}} switcherNavConfiguration={{...}} scanMetadata={{...}} narrowModeStatus={{...}} dialogState=\\"assessment\\" dismissDialog={[Function]} />
 </div>"
 `;
 
@@ -2254,16 +2131,14 @@ exports[`DetailsViewCommandBar renders with start test over dialog open 1`] = `
   </div>
   <div className=\\"detailsViewCommandButtons\\">
     <ReportExportButton showReportExportDialog={[Function]} buttonRef={[Function: buttonRef]} />
-    <FlaggedComponent featureFlag=\\"saveAndLoadAssessment\\" featureFlagStoreData={{...}} enableJSXElement={[undefined]} />
-    <FlaggedComponent featureFlag=\\"saveAndLoadAssessment\\" featureFlagStoreData={{...}} enableJSXElement={[undefined]} />
   </div>
-  <InvalidLoadAssessmentDialog deps={{...}} assessmentStoreData={{...}} tabStoreData={{...}} switcherNavConfiguration={{...}} scanMetadata={{...}} narrowModeStatus={{...}} featureFlagStoreData={{...}} isOpen={false} onClose={[Function]} />
-  <LoadAssessmentDialog deps={{...}} assessmentStoreData={{...}} tabStoreData={{...}} switcherNavConfiguration={{...}} scanMetadata={{...}} narrowModeStatus={{...}} featureFlagStoreData={{...}} isOpen={false} prevTab={{...}} loadedAssessmentData={{...}} tabId={5} onClose={[Function]} />
-  <StartOverDialog deps={{...}} assessmentStoreData={{...}} tabStoreData={{...}} switcherNavConfiguration={{...}} scanMetadata={{...}} narrowModeStatus={{...}} featureFlagStoreData={{...}} dialogState=\\"test\\" dismissDialog={[Function]} />
+  <InvalidLoadAssessmentDialog deps={{...}} assessmentStoreData={{...}} tabStoreData={{...}} switcherNavConfiguration={{...}} scanMetadata={{...}} narrowModeStatus={{...}} isOpen={false} onClose={[Function]} />
+  <LoadAssessmentDialog deps={{...}} assessmentStoreData={{...}} tabStoreData={{...}} switcherNavConfiguration={{...}} scanMetadata={{...}} narrowModeStatus={{...}} isOpen={false} prevTab={{...}} loadedAssessmentData={{...}} tabId={5} onClose={[Function]} />
+  <StartOverDialog deps={{...}} assessmentStoreData={{...}} tabStoreData={{...}} switcherNavConfiguration={{...}} scanMetadata={{...}} narrowModeStatus={{...}} dialogState=\\"test\\" dismissDialog={[Function]} />
 </div>"
 `;
 
-exports[`DetailsViewCommandBar renders without export button, save assessment, load assessment, and start over 1`] = `
+exports[`DetailsViewCommandBar renders without export button and without start over 1`] = `
 <div
   aria-label="command bar"
   className="detailsViewCommandBar"
@@ -2295,27 +2170,9 @@ exports[`DetailsViewCommandBar renders without export button, save assessment, l
   <div
     className="detailsViewCommandButtons"
   >
-    <FlaggedComponent
-      enableJSXElement={
-        <div>
-          Save assessment
-        </div>
-      }
-      featureFlag="saveAndLoadAssessment"
-      featureFlagStoreData={
-        Object {
-          "saveAndLoadAssessment": false,
-        }
-      }
-    />
-    <FlaggedComponent
-      featureFlag="saveAndLoadAssessment"
-      featureFlagStoreData={
-        Object {
-          "saveAndLoadAssessment": false,
-        }
-      }
-    />
+    <div>
+      Save assessment
+    </div>
   </div>
   <div>
     Export dialog
@@ -2362,11 +2219,6 @@ exports[`DetailsViewCommandBar renders without export button, save assessment, l
           "undoManualRequirementStatusChange": [Function],
           "undoManualTestStatusChange": [Function],
         },
-      }
-    }
-    featureFlagStoreData={
-      Object {
-        "saveAndLoadAssessment": false,
       }
     }
     isOpen={false}
@@ -2447,11 +2299,6 @@ exports[`DetailsViewCommandBar renders without export button, save assessment, l
           "undoManualRequirementStatusChange": [Function],
           "undoManualTestStatusChange": [Function],
         },
-      }
-    }
-    featureFlagStoreData={
-      Object {
-        "saveAndLoadAssessment": false,
       }
     }
     isOpen={false}
@@ -2546,11 +2393,6 @@ exports[`DetailsViewCommandBar renders without export button, save assessment, l
     }
     dialogState="none"
     dismissDialog={[Function]}
-    featureFlagStoreData={
-      Object {
-        "saveAndLoadAssessment": false,
-      }
-    }
     narrowModeStatus={
       Object {
         "isCommandBarCollapsed": false,
@@ -2588,7 +2430,7 @@ exports[`DetailsViewCommandBar renders without export button, save assessment, l
 </div>
 `;
 
-exports[`DetailsViewCommandBar renders without export button, without save assessment, without load assessment, with start over 1`] = `
+exports[`DetailsViewCommandBar renders without export button, with start over 1`] = `
 <div
   aria-label="command bar"
   className="detailsViewCommandBar"
@@ -2620,27 +2462,9 @@ exports[`DetailsViewCommandBar renders without export button, without save asses
   <div
     className="detailsViewCommandButtons"
   >
-    <FlaggedComponent
-      enableJSXElement={
-        <div>
-          Save assessment
-        </div>
-      }
-      featureFlag="saveAndLoadAssessment"
-      featureFlagStoreData={
-        Object {
-          "saveAndLoadAssessment": false,
-        }
-      }
-    />
-    <FlaggedComponent
-      featureFlag="saveAndLoadAssessment"
-      featureFlagStoreData={
-        Object {
-          "saveAndLoadAssessment": false,
-        }
-      }
-    />
+    <div>
+      Save assessment
+    </div>
     <CustomizedActionButton>
       Start Over Component
     </CustomizedActionButton>
@@ -2690,11 +2514,6 @@ exports[`DetailsViewCommandBar renders without export button, without save asses
           "undoManualRequirementStatusChange": [Function],
           "undoManualTestStatusChange": [Function],
         },
-      }
-    }
-    featureFlagStoreData={
-      Object {
-        "saveAndLoadAssessment": false,
       }
     }
     isOpen={false}
@@ -2775,11 +2594,6 @@ exports[`DetailsViewCommandBar renders without export button, without save asses
           "undoManualRequirementStatusChange": [Function],
           "undoManualTestStatusChange": [Function],
         },
-      }
-    }
-    featureFlagStoreData={
-      Object {
-        "saveAndLoadAssessment": false,
       }
     }
     isOpen={false}
@@ -2875,11 +2689,6 @@ exports[`DetailsViewCommandBar renders without export button, without save asses
     }
     dialogState="none"
     dismissDialog={[Function]}
-    featureFlagStoreData={
-      Object {
-        "saveAndLoadAssessment": false,
-      }
-    }
     narrowModeStatus={
       Object {
         "isCommandBarCollapsed": false,
